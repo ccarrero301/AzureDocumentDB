@@ -2,7 +2,7 @@
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
-namespace DocumentDB.Utilities
+namespace DocumentDB.Implementations
 {
     internal static class CosmosDbUtilities
     {
@@ -15,7 +15,7 @@ namespace DocumentDB.Utilities
         internal static Uri CreateDocumentUri(string databaseName, string collectionName, string documentId) =>
             UriFactory.CreateDocumentUri(databaseName, collectionName, documentId);
 
-        internal static RequestOptions GetRequestOptions(string partitionKey) => new RequestOptions
+        internal static RequestOptions SetRequestOptions(string partitionKey) => new RequestOptions
         {
             PartitionKey = new PartitionKey(partitionKey)
         };

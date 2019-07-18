@@ -4,7 +4,6 @@ using AutoMapper;
 using DocumentDB.Contracts;
 using DocumentDB.Entities;
 using DocumentDB.Exceptions;
-using DocumentDB.Utilities;
 
 namespace DocumentDB.Implementations
 {
