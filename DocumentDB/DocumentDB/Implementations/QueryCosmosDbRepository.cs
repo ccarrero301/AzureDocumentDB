@@ -62,10 +62,7 @@ namespace DocumentDB.Implementations
                 var documentCollectionUri =
                     CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
 
-                var feedOptions = new FeedOptions
-                {
-                    PartitionKey = new PartitionKey(partitionKey)
-                };
+                var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey);
 
                 using (var documentQuery = documentClient
                     .CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions)

@@ -19,5 +19,10 @@ namespace DocumentDB.Implementations
         {
             PartitionKey = new PartitionKey(partitionKey)
         };
+
+        internal static FeedOptions SetFeedOptions(string partitionKey) => new FeedOptions
+        {
+            PartitionKey = new PartitionKey(partitionKey)
+        };
     }
 }
