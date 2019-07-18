@@ -7,7 +7,7 @@ namespace DocumentDB.Contracts
     {
         Task<TEntity> AddDocumentAsync(TDocument document, string partitionKey);
 
-        Task UpdateDocumentAsync(TDocument document, string partitionKey);
+        Task<TEntity> UpdateDocumentAsync(TDocument document, string partitionKey);
 
         Task DeleteDocumentAsync(string documentId, string partitionKey);
     }

@@ -5,7 +5,6 @@ using AutoMapper;
 using DocumentDB.Contracts;
 using DocumentDB.Patterns.Specification.Contracts;
 using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 
 namespace DocumentDB.Implementations
