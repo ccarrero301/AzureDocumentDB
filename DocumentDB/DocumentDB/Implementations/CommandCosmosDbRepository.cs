@@ -56,7 +56,8 @@ namespace DocumentDB.Implementations
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, document.Id);
 
-                var documentUpdated = await documentClient.ReplaceDocumentAsync(documentUri, document).ConfigureAwait(false);
+                var documentUpdated =
+                    await documentClient.ReplaceDocumentAsync(documentUri, document).ConfigureAwait(false);
 
                 document.Id = documentUpdated.Resource.Id;
 

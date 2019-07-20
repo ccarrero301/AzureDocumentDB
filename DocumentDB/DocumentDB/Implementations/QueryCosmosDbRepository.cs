@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Contracts;
-using DocumentDB.Patterns.Specification.Contracts;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Linq;
+using Specification.Contracts;
 
 namespace DocumentDB.Implementations
 {

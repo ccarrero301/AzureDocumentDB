@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DocumentDB.Patterns.Specification.Contracts;
+using Specification.Contracts;
 
 namespace DocumentDB.Contracts
 {
