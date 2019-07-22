@@ -7,7 +7,7 @@ using DocumentDB.Exceptions;
 
 namespace DocumentDB.Implementations
 {
-    internal class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument>
+    public class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument>
         where TDocument : Entity
     {
         private readonly string _collectionName;

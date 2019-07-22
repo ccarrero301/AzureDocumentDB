@@ -9,7 +9,7 @@ using Specification.Contracts;
 
 namespace DocumentDB.Implementations
 {
-    internal class QueryCosmosDbRepository<TEntity> : IQueryDocumentDbRepository<TEntity>
+    public class QueryCosmosDbRepository<TEntity> : IQueryDocumentDbRepository<TEntity>
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbEndpointUri;
