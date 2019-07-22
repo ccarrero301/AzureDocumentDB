@@ -4,6 +4,7 @@ using AutoMapper;
 using DocumentDB.Contracts;
 using DocumentDB.Entities;
 using DocumentDB.Exceptions;
+using DocumentDB.Mappings;
 
 namespace DocumentDB.Implementations
 {
@@ -15,15 +16,18 @@ namespace DocumentDB.Implementations
         private readonly string _cosmosDbPrimaryKey;
         private readonly string _databaseName;
         private readonly IMapper _mapper;
+        private readonly Profile _mappingProfile;
 
         public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbPrimaryKey, string databaseName,
-            string collectionName, IMapper mapper)
+            string collectionName, Profile mappingProfile)
         {
             _cosmosDbEndpointUri = cosmosDbEndpointUri;
             _cosmosDbPrimaryKey = cosmosDbPrimaryKey;
             _databaseName = databaseName;
             _collectionName = collectionName;
-            _mapper = mapper;
+
+            _mappingProfile = mappingProfile;
+            _mapper = MappingConfiguration.Configure(_mappingProfile);
         }
 
         public async Task<TEntity> AddDocumentAsync(TDocument document, string partitionKey)
@@ -56,8 +60,11 @@ namespace DocumentDB.Implementations
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, document.Id);
 
+                var requestOptions = CosmosDbUtilities.SetRequestOptions(partitionKey);
+
                 var documentUpdated =
-                    await documentClient.ReplaceDocumentAsync(documentUri, document).ConfigureAwait(false);
+                    await documentClient.ReplaceDocumentAsync(documentUri, document, requestOptions)
+                        .ConfigureAwait(false);
 
                 document.Id = documentUpdated.Resource.Id;
 
@@ -75,14 +82,16 @@ namespace DocumentDB.Implementations
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, documentId);
 
-                await documentClient.DeleteDocumentAsync(documentUri).ConfigureAwait(false);
+                var requestOptions = CosmosDbUtilities.SetRequestOptions(partitionKey);
+
+                await documentClient.DeleteDocumentAsync(documentUri, requestOptions).ConfigureAwait(false);
             }
         }
 
         private async Task<bool> DocumentExistsAsync(string documentId, string partitionKey)
         {
             var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity>(_cosmosDbEndpointUri,
-                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mapper);
+                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
 
             var entity = await cosmosDbQueryRepository.GetDocumentByIdAsync<TDocument>(documentId, partitionKey)
                 .ConfigureAwait(false);

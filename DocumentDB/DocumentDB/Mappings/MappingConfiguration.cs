@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 
-namespace IntegrationTests.Mappings
+namespace DocumentDB.Mappings
 {
-    internal static class MappingConfiguration
+    internal class MappingConfiguration
     {
-        public static IMapper Configure()
+        internal static IMapper Configure(Profile mappingProfile)
         {
             var mappingConfiguration = new MapperConfiguration(configuration =>
             {
-                configuration.AddProfile(new MappingProfile());
+                configuration.AddProfile(mappingProfile);
             });
 
             var mapper = mappingConfiguration.CreateMapper();

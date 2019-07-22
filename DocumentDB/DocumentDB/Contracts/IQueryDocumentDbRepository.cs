@@ -8,7 +8,7 @@ namespace DocumentDB.Contracts
     {
         Task<TEntity> GetDocumentByIdAsync<TDocument>(string documentId, string partitionKey);
 
-        Task<IEnumerable<TEntity>> GetBySpecificationAsync<TDocument>(ISpecification<TDocument> documentSpecification,
+        IEnumerable<TEntity> GetBySpecification<TDocument>(ISpecification<TDocument> documentSpecification,
             string partitionKey);
     }
 }
