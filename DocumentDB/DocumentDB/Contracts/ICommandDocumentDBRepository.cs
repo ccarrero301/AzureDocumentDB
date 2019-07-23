@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using DocumentDB.Entities;
 
 namespace DocumentDB.Contracts
 {
-    internal interface ICommandDocumentDbRepository<TEntity, in TDocument> where TDocument : Entity
+    internal interface ICommandDocumentDbRepository<TEntity, in TDocument> where TDocument : IEntity
     {
         Task<TEntity> AddDocumentAsync(TDocument document, string partitionKey);
 

@@ -2,14 +2,13 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Contracts;
-using DocumentDB.Entities;
 using DocumentDB.Exceptions;
 using DocumentDB.Mappings;
 
 namespace DocumentDB.Implementations
 {
     public class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument>
-        where TDocument : Entity
+        where TDocument : IEntity
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbEndpointUri;

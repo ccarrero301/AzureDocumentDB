@@ -1,9 +1,9 @@
 ﻿using System;
-using DocumentDB.Entities;
+using DocumentDB.Contracts;
 
 namespace DocumentDB.Exceptions
 {
-    public class DocumentException<TDocument> : Exception where TDocument : Entity
+    public class DocumentException<TDocument> : Exception where TDocument : IEntity
     {
         public DocumentException(string message) : base(message)
         {

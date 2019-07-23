@@ -1,12 +1,12 @@
-﻿using DocumentDB.Entities;
+﻿using DocumentDB.Contracts;
 using Newtonsoft.Json;
 
 namespace IntegrationTests.Documents
 {
-    internal class Person : Entity
+    internal class Person : IEntity
     {
         [JsonProperty(PropertyName = "id")]
-        public override string Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty(PropertyName = "firstName")]
         public string FirstName { get; set; }
