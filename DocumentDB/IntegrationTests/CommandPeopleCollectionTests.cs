@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Implementations;
@@ -16,6 +17,7 @@ namespace IntegrationTests
         private string _cosmosDbPrimaryKey;
         private string _databaseName;
 
+        private List<(string, string)> _documentsToDelete;
         private Profile _mappingProfile;
         private QueryCosmosDbRepository<Documents.Person> _queryCosmosDbRepository;
 
@@ -28,13 +30,25 @@ namespace IntegrationTests
             _databaseName = "People";
             _collectionName = "PeopleCollection";
 
-            _mappingProfile = new MappingProfile();
+            _documentsToDelete = new List<(string, string)>();
 
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Documents.Person>(_cosmosDbEndpointUri,
-                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
+            _mappingProfile = new MappingProfile();
 
             _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbEndpointUri,
                 _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
+
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Documents.Person>(_cosmosDbEndpointUri,
+                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
+        }
+
+        [TearDown]
+        public async Task TearDownAsync()
+        {
+            foreach (var (documentId, partitionKey) in _documentsToDelete)
+            {
+                await _commandCosmosDbRepository.DeleteDocumentAsync(documentId, partitionKey)
+                    .ConfigureAwait(false);
+            }
         }
 
         [Test]
@@ -56,15 +70,14 @@ namespace IntegrationTests
             var personEntityFound = await _queryCosmosDbRepository
                 .GetDocumentByIdAsync<Documents.Person>(documentId, personEntityAdded.FamilyName).ConfigureAwait(false);
 
+            _documentsToDelete.Add((documentId, personEntityAdded.FamilyName));
+
             Assert.IsTrue(personEntityAdded != null);
             Assert.IsTrue(personEntityFound != null);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.Id, documentId) == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FamilyName, "Saldarriaga") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FirstName, "Beatriz") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.MiddleName, "Elena") == 0);
-
-            await _commandCosmosDbRepository.DeleteDocumentAsync(documentId, personEntityAdded.FamilyName)
-                .ConfigureAwait(false);
         }
 
         [Test]
@@ -98,14 +111,13 @@ namespace IntegrationTests
                 .GetDocumentByIdAsync<Documents.Person>(personEntityUpdated.Id, personEntityUpdated.FamilyName)
                 .ConfigureAwait(false);
 
+            _documentsToDelete.Add((documentId, personEntityAdded.FamilyName));
+
             Assert.IsTrue(personEntityUpdated != null);
             Assert.IsTrue(personEntityFound != null);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FamilyName, "Johnson") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FirstName, "Carlos") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.MiddleName, "Carrero") == 0);
-
-            await _commandCosmosDbRepository.DeleteDocumentAsync(documentId, personEntityAdded.FamilyName)
-                .ConfigureAwait(false);
         }
 
         [Test]
