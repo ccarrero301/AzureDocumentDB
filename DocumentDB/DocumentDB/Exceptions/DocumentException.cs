@@ -3,7 +3,7 @@ using DocumentDB.Entities;
 
 namespace DocumentDB.Exceptions
 {
-    internal class DocumentException<TDocument> : Exception where TDocument : Entity
+    public class DocumentException<TDocument> : Exception where TDocument : Entity
     {
         public DocumentException(string message) : base(message)
         {

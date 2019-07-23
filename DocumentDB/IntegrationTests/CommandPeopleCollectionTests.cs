@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using DocumentDB.Exceptions;
 using DocumentDB.Implementations;
 using IntegrationTests.Entities;
 using IntegrationTests.Mappings;
@@ -52,6 +53,28 @@ namespace IntegrationTests
         }
 
         [Test]
+        public async Task TryToAddExistentDocument()
+        {
+            var documentId = Guid.NewGuid().ToString();
+
+            var personDocumentToAdd = new Documents.Person
+            {
+                Id = documentId,
+                FirstName = "Beatriz",
+                MiddleName = "Elena",
+                FamilyName = "Saldarriaga"
+            };
+
+            var personEntityAdded = await _commandCosmosDbRepository
+                .AddDocumentAsync(personDocumentToAdd, personDocumentToAdd.FamilyName).ConfigureAwait(false);
+
+            _documentsToDelete.Add((documentId, personEntityAdded.FamilyName));
+
+            Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
+                _commandCosmosDbRepository.AddDocumentAsync(personDocumentToAdd, personDocumentToAdd.FamilyName));
+        }
+
+        [Test]
         public async Task AddDocument()
         {
             var documentId = Guid.NewGuid().ToString();
@@ -78,6 +101,24 @@ namespace IntegrationTests
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FamilyName, "Saldarriaga") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FirstName, "Beatriz") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.MiddleName, "Elena") == 0);
+        }
+
+        [Test]
+        public void TryToUpdateNotExistentDocument()
+        {
+            var documentId = Guid.NewGuid().ToString();
+
+            var personDocumentToUpdate = new Documents.Person
+            {
+                Id = documentId,
+                FirstName = "Carlos",
+                MiddleName = "Carrero",
+                FamilyName = "Johnson"
+            };
+
+            Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
+                _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate,
+                    personDocumentToUpdate.FamilyName));
         }
 
         [Test]
@@ -118,6 +159,23 @@ namespace IntegrationTests
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FamilyName, "Johnson") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.FirstName, "Carlos") == 0);
             Assert.IsTrue(string.CompareOrdinal(personEntityFound.MiddleName, "Carrero") == 0);
+        }
+
+        [Test]
+        public void TryToDeleteNotExistentDocument()
+        {
+            var documentId = Guid.NewGuid().ToString();
+
+            var personDocumentToDelete = new Documents.Person
+            {
+                Id = documentId,
+                FirstName = "Carlos",
+                MiddleName = "Carrero",
+                FamilyName = "Johnson"
+            };
+
+            Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
+                _commandCosmosDbRepository.DeleteDocumentAsync(documentId, personDocumentToDelete.FamilyName));
         }
 
         [Test]
