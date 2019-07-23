@@ -13,16 +13,16 @@ namespace DocumentDB.Implementations
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbEndpointUri;
-        private readonly string _cosmosDbPrimaryKey;
+        private readonly string _cosmosDbAccessKey;
         private readonly string _databaseName;
         private readonly IMapper _mapper;
         private readonly Profile _mappingProfile;
 
-        public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbPrimaryKey, string databaseName,
+        public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName,
             string collectionName, Profile mappingProfile)
         {
             _cosmosDbEndpointUri = cosmosDbEndpointUri;
-            _cosmosDbPrimaryKey = cosmosDbPrimaryKey;
+            _cosmosDbAccessKey = cosmosDbAccessKey;
             _databaseName = databaseName;
             _collectionName = collectionName;
 
@@ -36,7 +36,7 @@ namespace DocumentDB.Implementations
                 throw new DocumentException<TDocument>("Document already exists", document);
 
             using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbPrimaryKey))
+                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
                 var documentCollectionUri =
                     CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
@@ -56,7 +56,7 @@ namespace DocumentDB.Implementations
                 throw new DocumentException<TDocument>("Document does not exist", document);
 
             using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbPrimaryKey))
+                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, document.Id);
 
@@ -78,7 +78,7 @@ namespace DocumentDB.Implementations
                 throw new DocumentException<TDocument>($"Document with id {documentId} does not exist");
 
             using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbPrimaryKey))
+                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, documentId);
 
@@ -91,7 +91,7 @@ namespace DocumentDB.Implementations
         private async Task<bool> DocumentExistsAsync(string documentId, string partitionKey)
         {
             var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity>(_cosmosDbEndpointUri,
-                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
+                _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
             var entity = await cosmosDbQueryRepository.GetDocumentByIdAsync<TDocument>(documentId, partitionKey)
                 .ConfigureAwait(false);

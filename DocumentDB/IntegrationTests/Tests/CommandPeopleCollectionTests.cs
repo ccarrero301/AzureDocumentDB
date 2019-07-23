@@ -8,7 +8,7 @@ using IntegrationTests.Entities;
 using IntegrationTests.Mappings;
 using NUnit.Framework;
 
-namespace IntegrationTests
+namespace IntegrationTests.Tests
 {
     public class CommandPeopleCollectionTests
     {

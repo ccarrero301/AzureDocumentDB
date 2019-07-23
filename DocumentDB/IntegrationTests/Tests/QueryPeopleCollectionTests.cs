@@ -7,7 +7,7 @@ using IntegrationTests.Mappings;
 using IntegrationTests.Specifications;
 using NUnit.Framework;
 
-namespace IntegrationTests
+namespace IntegrationTests.Tests
 {
     public class QueryPeopleCollectionTests
     {

@@ -9,8 +9,8 @@ namespace DocumentDB.Implementations
         internal static Uri CreateDocumentCollectionUri(string databaseName, string collectionName) =>
             UriFactory.CreateDocumentCollectionUri(databaseName, collectionName);
 
-        internal static DocumentClient CreateDocumentClient(string cosmosDbEndpointUri, string cosmosDbPrimaryKey) =>
-            new DocumentClient(new Uri(cosmosDbEndpointUri), cosmosDbPrimaryKey);
+        internal static DocumentClient CreateDocumentClient(string cosmosDbEndpointUri, string cosmosDbAccessKey) =>
+            new DocumentClient(new Uri(cosmosDbEndpointUri), cosmosDbAccessKey);
 
         internal static Uri CreateDocumentUri(string databaseName, string collectionName, string documentId) =>
             UriFactory.CreateDocumentUri(databaseName, collectionName, documentId);
