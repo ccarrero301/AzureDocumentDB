@@ -2,6 +2,6 @@
 {
     public abstract class Entity
     {
-        public virtual string Id { get; set; }
+        public abstract string Id { get; set; }
     }
 }

@@ -70,8 +70,10 @@ namespace IntegrationTests
 
             _documentsToDelete.Add((documentId, personEntityAdded.FamilyName));
 
-            Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
+            var documentException = Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
                 _commandCosmosDbRepository.AddDocumentAsync(personDocumentToAdd, personDocumentToAdd.FamilyName));
+
+            Assert.IsTrue(documentException.Document != null);
         }
 
         [Test]
@@ -116,9 +118,11 @@ namespace IntegrationTests
                 FamilyName = "Johnson"
             };
 
-            Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
+            var documentException = Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
                 _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate,
                     personDocumentToUpdate.FamilyName));
+
+            Assert.IsTrue(documentException.Document != null);
         }
 
         [Test]
@@ -174,8 +178,10 @@ namespace IntegrationTests
                 FamilyName = "Johnson"
             };
 
-            Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
+            var documentException = Assert.ThrowsAsync<DocumentException<Documents.Person>>(() =>
                 _commandCosmosDbRepository.DeleteDocumentAsync(documentId, personDocumentToDelete.FamilyName));
+
+            Assert.IsTrue(documentException.Document == null);
         }
 
         [Test]
