@@ -20,9 +20,16 @@ namespace DocumentDB.Implementations
             PartitionKey = new PartitionKey(partitionKey)
         };
 
-        internal static FeedOptions SetFeedOptions(string partitionKey) => new FeedOptions
+        internal static FeedOptions SetFeedOptions(string partitionKey, int maxItemCount = 100,
+            bool enableCrossPartitionQuery = false, string continuationToken = null)
         {
-            PartitionKey = new PartitionKey(partitionKey)
-        };
+            return new FeedOptions
+            {
+                PartitionKey = new PartitionKey(partitionKey),
+                MaxItemCount = maxItemCount,
+                EnableCrossPartitionQuery = enableCrossPartitionQuery,
+                RequestContinuation = continuationToken
+            };
+        }
     }
 }

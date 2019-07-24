@@ -5,6 +5,8 @@ using AutoMapper;
 using DocumentDB.Contracts;
 using DocumentDB.Mappings;
 using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Linq;
+using Specification.Base;
 using Specification.Contracts;
 
 namespace DocumentDB.Implementations
@@ -61,24 +63,43 @@ namespace DocumentDB.Implementations
 
                 var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey);
 
-                //using (var documentQuery = documentClient
-                //    .CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions)
-                //    .Where(document => documentSpecification.IsSatisfiedBy(document)).AsDocumentQuery<TDocument>())
-                //{
-                //    while (documentQuery.HasMoreResults)
-                //    {
-                //        foreach (var document in await documentQuery.ExecuteNextAsync<TDocument>()
-                //            .ConfigureAwait(false))
-                //        {
-                //            documentList.Add(document);
-                //        }
-                //    }
-                //}
-
                 var documentList = documentClient.CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions)
                     .Where(documentSpecification.IsSatisfiedBy);
 
                 return _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList);
+            }
+        }
+
+        public async Task<(string continuationToken, IEnumerable<TEntity>)>
+            GetPaginatedResultsBySpecificationAsync<TDocument>(ExpressionSpecification<TDocument> documentSpecification,
+                string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null)
+        {
+            var documentList = new List<TDocument>();
+
+            using (var documentClient =
+                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            {
+                var documentCollectionUri =
+                    CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
+
+                var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey, pageSize, false, continuationToken);
+
+                using (var documentQuery = documentClient
+                    .CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions)
+                    .Where(documentSpecification.ToExpression()).AsDocumentQuery())
+                {
+                    var feedResponse = await documentQuery.ExecuteNextAsync<TDocument>().ConfigureAwait(false);
+
+                    foreach (var document in feedResponse)
+                    {
+                        documentList.Add(document);
+                    }
+
+                    var updatedContinuationToken = feedResponse.ResponseContinuation;
+
+                    return (updatedContinuationToken,
+                        _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList));
+                }
             }
         }
     }
