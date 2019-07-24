@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Implementations;
-using IntegrationTests.Entities;
+using IntegrationTests.Documents;
 using IntegrationTests.Mappings;
 using IntegrationTests.Specifications;
 using NUnit.Framework;
@@ -13,14 +13,13 @@ namespace IntegrationTests.Tests
     public class QueryPeopleCollectionTests
     {
         private string _collectionName;
-        private CommandCosmosDbRepository<Person, Documents.Person> _commandCosmosDbRepository;
         private string _cosmosDbAccessKey;
         private string _cosmosDbEndpointUri;
         private string _databaseName;
 
         private Profile _mappingProfile;
-        private List<Documents.Person> _peopleListToTest;
-        private QueryCosmosDbRepository<Person> _queryCosmosDbRepository;
+        private List<Person> _peopleListToTest;
+        private QueryCosmosDbRepository<Entities.Person> _queryCosmosDbRepository;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -33,17 +32,15 @@ namespace IntegrationTests.Tests
 
             _mappingProfile = new MappingProfile();
 
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey,
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey,
                 _databaseName, _collectionName, _mappingProfile);
 
-            _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbEndpointUri,
-                _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
-
-            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_commandCosmosDbRepository);
+            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
         }
 
         [OneTimeTearDown]
-        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_commandCosmosDbRepository, _peopleListToTest);
+        public Task TearDownAsync() =>
+            IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, _peopleListToTest);
 
         [Test]
         public async Task GetNotExistentDocumentByIdAndPartitionKey()
@@ -52,7 +49,7 @@ namespace IntegrationTests.Tests
             const string partitionKey = "Carrero";
 
             var personByIdAndPartitionKey = await _queryCosmosDbRepository
-                .GetDocumentByIdAsync<Person>(documentId, partitionKey).ConfigureAwait(false);
+                .GetDocumentByIdAsync<Entities.Person>(documentId, partitionKey).ConfigureAwait(false);
 
             Assert.IsTrue(personByIdAndPartitionKey == null);
         }
@@ -64,7 +61,7 @@ namespace IntegrationTests.Tests
             const string partitionKey = "Carrero";
 
             var personByIdAndPartitionKey = await _queryCosmosDbRepository
-                .GetDocumentByIdAsync<Person>(documentId, partitionKey).ConfigureAwait(false);
+                .GetDocumentByIdAsync<Entities.Person>(documentId, partitionKey).ConfigureAwait(false);
 
             Assert.IsTrue(personByIdAndPartitionKey != null);
             Assert.IsTrue(personByIdAndPartitionKey.FamilyName == "Carrero");
