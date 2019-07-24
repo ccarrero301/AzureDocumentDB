@@ -23,15 +23,13 @@ namespace IntegrationTests.Tests
         private QueryCosmosDbRepository<Person> _queryCosmosDbRepository;
 
         [OneTimeSetUp]
-        public Task SetupAsync()
+        public async Task SetupAsync()
         {
             _cosmosDbEndpointUri = "https://localhost:8081";
             _cosmosDbAccessKey =
                 "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
             _databaseName = "People";
             _collectionName = "PeopleCollection";
-
-            _peopleListToTest = new List<Documents.Person>();
 
             _mappingProfile = new MappingProfile();
 
@@ -41,11 +39,11 @@ namespace IntegrationTests.Tests
             _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbEndpointUri,
                 _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
-            return AddDocumentsToTestAsync();
+            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_commandCosmosDbRepository);
         }
 
         [OneTimeTearDown]
-        public Task TearDownAsync() => DeleteDocumentsToTestAsync();
+        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_commandCosmosDbRepository, _peopleListToTest);
 
         [Test]
         public async Task GetNotExistentDocumentByIdAndPartitionKey()
@@ -169,43 +167,6 @@ namespace IntegrationTests.Tests
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Beatriz");
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Elena");
-        }
-
-        private static Documents.Person CreateDocument(string id, string firstName, string middleName,
-            string familyName) =>
-            new Documents.Person
-            {
-                Id = id,
-                FirstName = firstName,
-                MiddleName = middleName,
-                FamilyName = familyName
-            };
-
-        private async Task AddDocumentsToTestAsync()
-        {
-            _peopleListToTest = new List<Documents.Person>
-            {
-                CreateDocument("1", "Carlos", "Andres", "Carrero"),
-                CreateDocument("2", "Luis", "Miguel", "Carrero"),
-                CreateDocument("3", "Beatriz", "Elena", "Carrero")
-            };
-
-            foreach (var personDocument in _peopleListToTest)
-            {
-                await _commandCosmosDbRepository.AddDocumentAsync(personDocument, personDocument.FamilyName)
-                    .ConfigureAwait(false);
-            }
-        }
-
-        private async Task DeleteDocumentsToTestAsync()
-        {
-            foreach (var personDocument in _peopleListToTest)
-            {
-                await _commandCosmosDbRepository.DeleteDocumentAsync(personDocument.Id, personDocument.FamilyName)
-                    .ConfigureAwait(false);
-            }
-
-            _peopleListToTest = null;
         }
     }
 }
