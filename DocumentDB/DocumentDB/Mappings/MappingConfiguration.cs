@@ -6,10 +6,7 @@ namespace DocumentDB.Mappings
     {
         internal static IMapper Configure(Profile mappingProfile)
         {
-            var mappingConfiguration = new MapperConfiguration(configuration =>
-            {
-                configuration.AddProfile(mappingProfile);
-            });
+            var mappingConfiguration = new MapperConfiguration(configuration => { configuration.AddProfile(mappingProfile); });
 
             var mapper = mappingConfiguration.CreateMapper();
 
