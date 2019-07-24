@@ -19,8 +19,7 @@ namespace DocumentDB.Implementations
         private readonly string _databaseName;
         private readonly IMapper _mapper;
 
-        public QueryCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName,
-            string collectionName, Profile mappingProfile)
+        public QueryCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile)
         {
             _cosmosDbEndpointUri = cosmosDbEndpointUri;
             _cosmosDbAccessKey = cosmosDbAccessKey;
@@ -34,14 +33,12 @@ namespace DocumentDB.Implementations
         {
             try
             {
-                using (var documentClient =
-                    CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+                using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
                 {
                     var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, documentId);
                     var requestOptions = CosmosDbUtilities.SetRequestOptions(partitionKey);
 
-                    var document = await documentClient.ReadDocumentAsync<TDocument>(documentUri, requestOptions)
-                        .ConfigureAwait(false);
+                    var document = await documentClient.ReadDocumentAsync<TDocument>(documentUri, requestOptions).ConfigureAwait(false);
 
                     return _mapper.Map<TDocument, TEntity>(document.Document);
                 }
@@ -54,37 +51,29 @@ namespace DocumentDB.Implementations
 
         public IEnumerable<TEntity> GetBySpecification(ISpecification<TDocument> documentSpecification, string partitionKey)
         {
-            using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
-                var documentCollectionUri =
-                    CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
+                var documentCollectionUri = CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
 
                 var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey);
 
-                var documentList = documentClient.CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions)
-                    .Where(documentSpecification.IsSatisfiedBy);
+                var documentList = documentClient.CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions).Where(documentSpecification.IsSatisfiedBy);
 
                 return _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList);
             }
         }
 
-        public async Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification,
-            string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null)
+        public async Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null)
         {
             var documentList = new List<TDocument>();
 
-            using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
-                var documentCollectionUri =
-                    CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
+                var documentCollectionUri = CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
 
                 var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey, pageSize, false, continuationToken);
 
-                using (var documentQuery = documentClient
-                    .CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions)
-                    .Where(documentSpecification.ToExpression()).AsDocumentQuery())
+                using (var documentQuery = documentClient.CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions).Where(documentSpecification.ToExpression()).AsDocumentQuery())
                 {
                     var feedResponse = await documentQuery.ExecuteNextAsync<TDocument>().ConfigureAwait(false);
 
@@ -95,8 +84,7 @@ namespace DocumentDB.Implementations
 
                     var updatedContinuationToken = feedResponse.ResponseContinuation;
 
-                    return (updatedContinuationToken,
-                        _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList));
+                    return (updatedContinuationToken, _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList));
                 }
             }
         }
