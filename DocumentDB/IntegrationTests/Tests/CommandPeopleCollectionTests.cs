@@ -16,7 +16,6 @@ namespace IntegrationTests.Tests
         private string _cosmosDbAccessKey;
         private string _cosmosDbEndpointUri;
         private string _databaseName;
-
         private List<(string, string)> _documentsToDelete;
         private Profile _mappingProfile;
 

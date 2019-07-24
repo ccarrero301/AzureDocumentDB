@@ -16,7 +16,6 @@ namespace IntegrationTests.Tests
         private string _cosmosDbAccessKey;
         private string _cosmosDbEndpointUri;
         private string _databaseName;
-
         private Profile _mappingProfile;
         private List<Person> _peopleListToTest;
         private QueryCosmosDbRepository<Entities.Person> _queryCosmosDbRepository;
