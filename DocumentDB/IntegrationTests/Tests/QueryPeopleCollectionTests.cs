@@ -18,7 +18,7 @@ namespace IntegrationTests.Tests
         private string _databaseName;
         private Profile _mappingProfile;
         private List<Person> _peopleListToTest;
-        private QueryCosmosDbRepository<Entities.Person> _queryCosmosDbRepository;
+        private QueryCosmosDbRepository<Entities.Person, Person> _queryCosmosDbRepository;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -31,7 +31,7 @@ namespace IntegrationTests.Tests
 
             _mappingProfile = new MappingProfile();
 
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey,
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey,
                 _databaseName, _collectionName, _mappingProfile);
 
             _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
@@ -47,8 +47,7 @@ namespace IntegrationTests.Tests
             const string documentId = "-1";
             const string partitionKey = "Carrero";
 
-            var personByIdAndPartitionKey = await _queryCosmosDbRepository
-                .GetDocumentByIdAsync<Entities.Person>(documentId, partitionKey).ConfigureAwait(false);
+            var personByIdAndPartitionKey = await _queryCosmosDbRepository.GetDocumentByIdAsync(documentId, partitionKey).ConfigureAwait(false);
 
             Assert.IsTrue(personByIdAndPartitionKey == null);
         }
@@ -59,8 +58,7 @@ namespace IntegrationTests.Tests
             const string documentId = "1";
             const string partitionKey = "Carrero";
 
-            var personByIdAndPartitionKey = await _queryCosmosDbRepository
-                .GetDocumentByIdAsync<Entities.Person>(documentId, partitionKey).ConfigureAwait(false);
+            var personByIdAndPartitionKey = await _queryCosmosDbRepository.GetDocumentByIdAsync(documentId, partitionKey).ConfigureAwait(false);
 
             Assert.IsTrue(personByIdAndPartitionKey != null);
             Assert.IsTrue(personByIdAndPartitionKey.FamilyName == "Carrero");

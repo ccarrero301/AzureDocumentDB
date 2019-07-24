@@ -11,7 +11,7 @@ using Specification.Contracts;
 
 namespace DocumentDB.Implementations
 {
-    public class QueryCosmosDbRepository<TEntity> : IQueryDocumentDbRepository<TEntity>
+    public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbAccessKey;
@@ -30,7 +30,7 @@ namespace DocumentDB.Implementations
             _mapper = MappingConfiguration.Configure(mappingProfile);
         }
 
-        public async Task<TEntity> GetDocumentByIdAsync<TDocument>(string documentId, string partitionKey)
+        public async Task<TEntity> GetDocumentByIdAsync(string documentId, string partitionKey)
         {
             try
             {
@@ -52,8 +52,7 @@ namespace DocumentDB.Implementations
             }
         }
 
-        public IEnumerable<TEntity> GetBySpecification<TDocument>(ISpecification<TDocument> documentSpecification,
-            string partitionKey)
+        public IEnumerable<TEntity> GetBySpecification(ISpecification<TDocument> documentSpecification, string partitionKey)
         {
             using (var documentClient =
                 CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
@@ -70,9 +69,8 @@ namespace DocumentDB.Implementations
             }
         }
 
-        public async Task<(string continuationToken, IEnumerable<TEntity>)>
-            GetPaginatedResultsBySpecificationAsync<TDocument>(ExpressionSpecification<TDocument> documentSpecification,
-                string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null)
+        public async Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification,
+            string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null)
         {
             var documentList = new List<TDocument>();
 

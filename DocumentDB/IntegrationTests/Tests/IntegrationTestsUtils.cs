@@ -77,13 +77,13 @@ namespace IntegrationTests.Tests
             return personDocumentToAdd;
         }
 
-        internal static Task<Person> GetDocumentByIdAndPartitionKey(string cosmosDbEndpointUri, string cosmosDbAccessKey,
+        internal static Task<Entities.Person> GetDocumentByIdAndPartitionKey(string cosmosDbEndpointUri, string cosmosDbAccessKey,
             string databaseName, string collectionName, Profile mappingProfile, string id, string partitionKey)
         {
-            var queryCosmosDbRepository = new QueryCosmosDbRepository<Person>(cosmosDbEndpointUri,
+            var queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(cosmosDbEndpointUri,
                 cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
 
-            return queryCosmosDbRepository.GetDocumentByIdAsync<Person>(id, partitionKey);
+            return queryCosmosDbRepository.GetDocumentByIdAsync(id, partitionKey);
         }
     }
 }
