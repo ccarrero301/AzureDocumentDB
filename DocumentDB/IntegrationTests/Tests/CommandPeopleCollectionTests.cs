@@ -14,19 +14,19 @@ namespace IntegrationTests.Tests
     {
         private string _collectionName;
         private CommandCosmosDbRepository<Person, Documents.Person> _commandCosmosDbRepository;
+        private string _cosmosDbAccessKey;
         private string _cosmosDbEndpointUri;
-        private string _cosmosDbPrimaryKey;
         private string _databaseName;
 
         private List<(string, string)> _documentsToDelete;
         private Profile _mappingProfile;
         private QueryCosmosDbRepository<Documents.Person> _queryCosmosDbRepository;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             _cosmosDbEndpointUri = "https://localhost:8081";
-            _cosmosDbPrimaryKey =
+            _cosmosDbAccessKey =
                 "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
             _databaseName = "People";
             _collectionName = "PeopleCollection";
@@ -36,13 +36,13 @@ namespace IntegrationTests.Tests
             _mappingProfile = new MappingProfile();
 
             _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbEndpointUri,
-                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
+                _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
             _queryCosmosDbRepository = new QueryCosmosDbRepository<Documents.Person>(_cosmosDbEndpointUri,
-                _cosmosDbPrimaryKey, _databaseName, _collectionName, _mappingProfile);
+                _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public async Task TearDownAsync()
         {
             foreach (var (documentId, partitionKey) in _documentsToDelete)
@@ -99,10 +99,10 @@ namespace IntegrationTests.Tests
 
             Assert.IsTrue(personEntityAdded != null);
             Assert.IsTrue(personEntityFound != null);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.Id, documentId) == 0);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.FamilyName, "Saldarriaga") == 0);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.FirstName, "Beatriz") == 0);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.MiddleName, "Elena") == 0);
+            Assert.IsTrue(personEntityFound.Id == documentId);
+            Assert.IsTrue(personEntityFound.FamilyName == "Saldarriaga");
+            Assert.IsTrue(personEntityFound.FirstName == "Beatriz");
+            Assert.IsTrue(personEntityFound.MiddleName == "Elena");
         }
 
         [Test]
@@ -160,9 +160,9 @@ namespace IntegrationTests.Tests
 
             Assert.IsTrue(personEntityUpdated != null);
             Assert.IsTrue(personEntityFound != null);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.FamilyName, "Johnson") == 0);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.FirstName, "Carlos") == 0);
-            Assert.IsTrue(string.CompareOrdinal(personEntityFound.MiddleName, "Carrero") == 0);
+            Assert.IsTrue(personEntityFound.FamilyName == "Johnson");
+            Assert.IsTrue(personEntityFound.FirstName == "Carlos");
+            Assert.IsTrue(personEntityFound.MiddleName == "Carrero");
         }
 
         [Test]

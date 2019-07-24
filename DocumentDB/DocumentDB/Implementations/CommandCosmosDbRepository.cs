@@ -11,8 +11,8 @@ namespace DocumentDB.Implementations
         where TDocument : IEntity
     {
         private readonly string _collectionName;
-        private readonly string _cosmosDbEndpointUri;
         private readonly string _cosmosDbAccessKey;
+        private readonly string _cosmosDbEndpointUri;
         private readonly string _databaseName;
         private readonly IMapper _mapper;
         private readonly Profile _mappingProfile;

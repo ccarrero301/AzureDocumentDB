@@ -5,9 +5,6 @@ namespace IntegrationTests.Documents
 {
     internal class Person : IEntity
     {
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
-
         [JsonProperty(PropertyName = "firstName")]
         public string FirstName { get; set; }
 
@@ -16,5 +13,7 @@ namespace IntegrationTests.Documents
 
         [JsonProperty(PropertyName = "familyName")]
         public string FamilyName { get; set; }
+
+        [JsonProperty(PropertyName = "id")] public string Id { get; set; }
     }
 }
