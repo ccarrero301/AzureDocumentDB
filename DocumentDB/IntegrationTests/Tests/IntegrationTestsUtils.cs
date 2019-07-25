@@ -27,7 +27,8 @@ namespace IntegrationTests.Tests
             {
                 CreateDocument("1", "Carlos", "Andres", "Carrero"),
                 CreateDocument("2", "Luis", "Miguel", "Carrero"),
-                CreateDocument("3", "Beatriz", "Elena", "Carrero")
+                CreateDocument("3", "Miguel", "Antonio", "Carrero"),
+                CreateDocument("4", "Beatriz", "Elena", "Saldarriaga")
             };
 
             foreach (var personDocument in peopleListToTest)

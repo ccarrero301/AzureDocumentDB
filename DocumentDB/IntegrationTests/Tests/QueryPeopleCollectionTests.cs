@@ -75,11 +75,10 @@ namespace IntegrationTests.Tests
             var documentsBySpecificationList = _queryCosmosDbRepository
                 .GetBySpecification(carlosFirstNameSpecification, partitionKey).ToList();
 
-            Assert.IsTrue(documentsBySpecificationList.Any());
-            Assert.IsTrue(documentsBySpecificationList.Count() == 1);
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Carlos");
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Andres");
+            Assert.IsTrue(documentsBySpecificationList.Count == 1);
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FirstName == "Carlos");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.MiddleName == "Andres");
         }
 
         [Test]
@@ -93,7 +92,6 @@ namespace IntegrationTests.Tests
                 .ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken == null);
-            Assert.IsTrue(documentsBySpecificationList.Any());
             Assert.IsTrue(documentsBySpecificationList.Count() == 3);
         }
 
@@ -108,11 +106,10 @@ namespace IntegrationTests.Tests
                 .ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken != null);
-            Assert.IsTrue(documentsBySpecificationList.Any());
             Assert.IsTrue(documentsBySpecificationList.Count() == 1);
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Carlos");
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Andres");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FirstName == "Carlos");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.MiddleName == "Andres");
         }
 
         [Test]
@@ -130,7 +127,6 @@ namespace IntegrationTests.Tests
                 .ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken != null);
-            Assert.IsTrue(documentsBySpecificationList.Any());
             Assert.IsTrue(documentsBySpecificationList.Count() == 1);
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Luis");
@@ -156,11 +152,10 @@ namespace IntegrationTests.Tests
                 .ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken == null);
-            Assert.IsTrue(documentsBySpecificationList.Any());
             Assert.IsTrue(documentsBySpecificationList.Count() == 1);
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Beatriz");
-            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Elena");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Miguel");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Antonio");
         }
     }
 }
