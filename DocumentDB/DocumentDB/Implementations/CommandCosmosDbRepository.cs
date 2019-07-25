@@ -7,7 +7,7 @@ using DocumentDB.Mappings;
 
 namespace DocumentDB.Implementations
 {
-    public class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
+    public class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity where TEntity : IEntity
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbAccessKey;

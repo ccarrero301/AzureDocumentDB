@@ -1,6 +1,8 @@
 ﻿using System;
-using Microsoft.Azure.Documents;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Documents.Client;
+using PartitionKey = Microsoft.Azure.Documents.PartitionKey;
+using RequestOptions = Microsoft.Azure.Documents.Client.RequestOptions;
 
 namespace DocumentDB.Implementations
 {
@@ -25,6 +27,12 @@ namespace DocumentDB.Implementations
                 MaxItemCount = maxItemCount,
                 EnableCrossPartitionQuery = enableCrossPartitionQuery,
                 RequestContinuation = continuationToken
+            };
+
+        internal static QueryRequestOptions SetQueryRequestOptions(string partitionKey) =>
+            new QueryRequestOptions
+            {
+                PartitionKey = new Microsoft.Azure.Cosmos.PartitionKey(partitionKey)
             };
     }
 }

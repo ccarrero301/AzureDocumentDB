@@ -1,6 +1,8 @@
-﻿namespace IntegrationTests.Entities
+﻿using DocumentDB.Contracts;
+
+namespace IntegrationTests.Entities
 {
-    internal class Person
+    internal class Person : IEntity
     {
         public string Id { get; set; }
 
