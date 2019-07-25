@@ -36,7 +36,8 @@ namespace IntegrationTests.Tests
         }
 
         [OneTimeTearDown]
-        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, _peopleListToTest);
+        public Task TearDownAsync() =>
+            IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, _peopleListToTest);
 
         [Test]
         public async Task GetNotExistentDocumentByIdAndPartitionKey()
@@ -97,7 +98,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken != null);
             Assert.IsTrue(documentsBySpecificationList.Any());
@@ -113,9 +115,11 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
 
-            (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
+            (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken != null);
             Assert.IsTrue(documentsBySpecificationList.Any());
@@ -131,11 +135,14 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
 
-            (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
+            (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
 
-            (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 3, 1, continuationToken).ConfigureAwait(false);
+            (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 3, 1, continuationToken).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken == null);
             Assert.IsTrue(documentsBySpecificationList.Any());

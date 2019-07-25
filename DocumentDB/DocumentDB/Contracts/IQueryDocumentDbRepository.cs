@@ -11,6 +11,7 @@ namespace DocumentDB.Contracts
 
         IEnumerable<TEntity> GetBySpecification(ISpecification<TDocument> documentSpecification, string partitionKey);
 
-        Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null);
+        Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey,
+            int pageNumber = 1, int pageSize = 100, string continuationToken = null);
     }
 }

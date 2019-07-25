@@ -12,19 +12,19 @@ namespace DocumentDB.Implementations
 
         internal static Uri CreateDocumentUri(string databaseName, string collectionName, string documentId) => UriFactory.CreateDocumentUri(databaseName, collectionName, documentId);
 
-        internal static RequestOptions SetRequestOptions(string partitionKey) => 
-        new RequestOptions
-        {
-            PartitionKey = new PartitionKey(partitionKey)
-        };
+        internal static RequestOptions SetRequestOptions(string partitionKey) =>
+            new RequestOptions
+            {
+                PartitionKey = new PartitionKey(partitionKey)
+            };
 
         internal static FeedOptions SetFeedOptions(string partitionKey, int maxItemCount = 100, bool enableCrossPartitionQuery = false, string continuationToken = null) =>
-        new FeedOptions
-        {
-            PartitionKey = new PartitionKey(partitionKey),
-            MaxItemCount = maxItemCount,
-            EnableCrossPartitionQuery = enableCrossPartitionQuery,
-            RequestContinuation = continuationToken
-        };
+            new FeedOptions
+            {
+                PartitionKey = new PartitionKey(partitionKey),
+                MaxItemCount = maxItemCount,
+                EnableCrossPartitionQuery = enableCrossPartitionQuery,
+                RequestContinuation = continuationToken
+            };
     }
 }

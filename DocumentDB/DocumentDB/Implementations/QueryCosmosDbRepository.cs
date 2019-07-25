@@ -63,7 +63,8 @@ namespace DocumentDB.Implementations
             }
         }
 
-        public async Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey, int pageNumber = 1, int pageSize = 100, string continuationToken = null)
+        public async Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey,
+            int pageNumber = 1, int pageSize = 100, string continuationToken = null)
         {
             var documentList = new List<TDocument>();
 

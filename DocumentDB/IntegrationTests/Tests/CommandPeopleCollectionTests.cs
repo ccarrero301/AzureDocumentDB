@@ -52,7 +52,9 @@ namespace IntegrationTests.Tests
         {
             var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("2", "Beatriz2", "Elena", "Saldarriaga", _commandCosmosDbRepository, _documentsToDelete).ConfigureAwait(false);
 
-            var personEntityFound = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
+            var personEntityFound = await IntegrationTestsUtils
+                .GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personDocumentAdded.Id, personDocumentAdded.FamilyName)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(personEntityFound != null);
             Assert.IsTrue(personEntityFound.Id == personDocumentAdded.Id);
@@ -66,7 +68,8 @@ namespace IntegrationTests.Tests
         {
             var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument("3", "Carlos1", "Carrero", "Johnson");
 
-            var documentException = Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentToUpdate.FamilyName));
+            var documentException =
+                Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentToUpdate.FamilyName));
 
             Assert.IsTrue(documentException.Document != null);
         }
@@ -80,7 +83,9 @@ namespace IntegrationTests.Tests
 
             var personEntityUpdated = await _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
-            var personEntityFound = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName,_mappingProfile, personEntityUpdated.Id, personEntityUpdated.FamilyName).ConfigureAwait(false);
+            var personEntityFound = await IntegrationTestsUtils
+                .GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personEntityUpdated.Id, personEntityUpdated.FamilyName)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(personEntityUpdated != null);
             Assert.IsTrue(personEntityFound != null);
@@ -94,7 +99,8 @@ namespace IntegrationTests.Tests
         {
             var personDocumentToDelete = IntegrationTestsUtils.CreateDocument("5", "Carlos3", "Carrero", "Johnson");
 
-            var documentException = Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentToDelete.Id, personDocumentToDelete.FamilyName));
+            var documentException =
+                Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentToDelete.Id, personDocumentToDelete.FamilyName));
 
             Assert.IsTrue(documentException.Document == null);
         }
@@ -106,7 +112,9 @@ namespace IntegrationTests.Tests
 
             await _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
-            var personEntityDeleted = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
+            var personEntityDeleted = await IntegrationTestsUtils
+                .GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personDocumentAdded.Id, personDocumentAdded.FamilyName)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(personEntityDeleted == null);
         }
