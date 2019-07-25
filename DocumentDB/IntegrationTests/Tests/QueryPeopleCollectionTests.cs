@@ -24,17 +24,15 @@ namespace IntegrationTests.Tests
         public async Task SetupAsync()
         {
             _cosmosDbEndpointUri = "https://localhost:8081";
-            _cosmosDbAccessKey =
-                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+            _cosmosDbAccessKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
             _databaseName = "People";
             _collectionName = "PeopleCollection";
 
             _mappingProfile = new MappingProfile();
 
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey,
-                _databaseName, _collectionName, _mappingProfile);
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
-            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
+            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile).ConfigureAwait(false);
         }
 
         [OneTimeTearDown]
@@ -72,8 +70,7 @@ namespace IntegrationTests.Tests
             var carlosFirstNameSpecification = new FirstNameSpecification("Carlos");
             const string partitionKey = "Carrero";
 
-            var documentsBySpecificationList = _queryCosmosDbRepository
-                .GetBySpecification(carlosFirstNameSpecification, partitionKey).ToList();
+            var documentsBySpecificationList = _queryCosmosDbRepository.GetBySpecification(carlosFirstNameSpecification, partitionKey).ToList();
 
             Assert.IsTrue(documentsBySpecificationList.Count == 1);
             Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
@@ -87,9 +84,7 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey)
-                .ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken == null);
             Assert.IsTrue(documentsBySpecificationList.Count() == 3);
@@ -101,9 +96,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1)
-                .ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken != null);
             Assert.IsTrue(documentsBySpecificationList.Count() == 1);
@@ -118,13 +112,11 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1)
-                .ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
 
-            (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken)
-                .ConfigureAwait(false);
+            (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken != null);
             Assert.IsTrue(documentsBySpecificationList.Count() == 1);
@@ -139,17 +131,14 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1)
-                .ConfigureAwait(false);
+            var (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
 
-            (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken)
-                .ConfigureAwait(false);
+            (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
 
-            (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository
-                .GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 3, 1, continuationToken)
-                .ConfigureAwait(false);
+            (continuationToken, documentsBySpecificationList) =
+                await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 3, 1, continuationToken).ConfigureAwait(false);
 
             Assert.IsTrue(continuationToken == null);
             Assert.IsTrue(documentsBySpecificationList.Count() == 1);

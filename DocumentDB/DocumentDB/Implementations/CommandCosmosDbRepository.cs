@@ -7,8 +7,7 @@ using DocumentDB.Mappings;
 
 namespace DocumentDB.Implementations
 {
-    public class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument>
-        where TDocument : IEntity
+    public class CommandCosmosDbRepository<TEntity, TDocument> : ICommandDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbAccessKey;
@@ -17,8 +16,7 @@ namespace DocumentDB.Implementations
         private readonly IMapper _mapper;
         private readonly Profile _mappingProfile;
 
-        public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName,
-            string collectionName, Profile mappingProfile)
+        public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile)
         {
             _cosmosDbEndpointUri = cosmosDbEndpointUri;
             _cosmosDbAccessKey = cosmosDbAccessKey;
@@ -34,14 +32,11 @@ namespace DocumentDB.Implementations
             if (await DocumentExistsAsync(document.Id, partitionKey).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document already exists", document);
 
-            using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
-                var documentCollectionUri =
-                    CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
+                var documentCollectionUri = CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
 
-                var documentCreated = await documentClient.CreateDocumentAsync(documentCollectionUri, document)
-                    .ConfigureAwait(false);
+                var documentCreated = await documentClient.CreateDocumentAsync(documentCollectionUri, document).ConfigureAwait(false);
 
                 document.Id = documentCreated.Resource.Id;
 
@@ -54,16 +49,13 @@ namespace DocumentDB.Implementations
             if (!await DocumentExistsAsync(document.Id, partitionKey).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document does not exist", document);
 
-            using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, document.Id);
 
                 var requestOptions = CosmosDbUtilities.SetRequestOptions(partitionKey);
 
-                var documentUpdated =
-                    await documentClient.ReplaceDocumentAsync(documentUri, document, requestOptions)
-                        .ConfigureAwait(false);
+                var documentUpdated = await documentClient.ReplaceDocumentAsync(documentUri, document, requestOptions).ConfigureAwait(false);
 
                 document.Id = documentUpdated.Resource.Id;
 
@@ -76,8 +68,7 @@ namespace DocumentDB.Implementations
             if (!await DocumentExistsAsync(documentId, partitionKey).ConfigureAwait(false))
                 throw new DocumentException<TDocument>($"Document with id {documentId} does not exist");
 
-            using (var documentClient =
-                CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
                 var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, documentId);
 
@@ -89,8 +80,7 @@ namespace DocumentDB.Implementations
 
         private async Task<bool> DocumentExistsAsync(string documentId, string partitionKey)
         {
-            var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(_cosmosDbEndpointUri,
-                _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
+            var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
             var entity = await cosmosDbQueryRepository.GetDocumentByIdAsync(documentId, partitionKey).ConfigureAwait(false);
 
