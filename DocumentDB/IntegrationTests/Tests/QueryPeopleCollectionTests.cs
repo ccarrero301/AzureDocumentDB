@@ -28,17 +28,17 @@ namespace IntegrationTests.Tests
             _cosmosDbAccessKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
             _databaseName = "People";
             _collectionName = "PeopleCollection";
-
             _mappingProfile = new MappingProfile();
-
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
-
-            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile).ConfigureAwait(false);
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName,
+                _collectionName, _mappingProfile);
+            _peopleListToTest = await IntegrationTestsUtils
+                .AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile)
+                .ConfigureAwait(false);
         }
 
         [OneTimeTearDown]
-        public Task TearDownAsync() =>
-            IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, _peopleListToTest);
+        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName,
+            _collectionName, _mappingProfile, _peopleListToTest);
 
         [Test]
         public async Task GetNotExistentDocumentByIdAndPartitionKey()
@@ -75,7 +75,8 @@ namespace IntegrationTests.Tests
             var carlosFirstNameSpecification = new FirstNameSpecification("Carlos");
             const string partitionKey = "Carrero";
 
-            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, carlosFirstNameSpecification).ConfigureAwait(false);
+            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, carlosFirstNameSpecification)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
@@ -91,7 +92,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 1).ConfigureAwait(false);
+            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 1)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
@@ -107,7 +109,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var cosmosDocumentResponse = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 2).ConfigureAwait(false));
+            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 2)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
@@ -126,7 +129,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 3).ConfigureAwait(false);
+            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 3)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
@@ -148,7 +152,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 2, 1).ConfigureAwait(false);
+            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 2, 1)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
@@ -164,7 +169,8 @@ namespace IntegrationTests.Tests
             var familyNameSpecification = new FamilyNameSpecification("Carrero");
             const string partitionKey = "Carrero";
 
-            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 3, 1).ConfigureAwait(false);
+            var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 3, 1)
+                .ConfigureAwait(false);
 
             Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);

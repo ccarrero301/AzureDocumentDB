@@ -7,7 +7,8 @@ namespace DocumentDB.Exceptions
     {
         public DocumentException(string message) : base(message) { }
 
-        public DocumentException(string message, TDocument document) : base($"Error : {message}, Document with Id : {document.Id}") => Document = document;
+        public DocumentException(string message, TDocument document) : base($"Error : {message}, Document with Id : {document.Id}") =>
+            Document = document;
 
         public TDocument Document { get; }
     }

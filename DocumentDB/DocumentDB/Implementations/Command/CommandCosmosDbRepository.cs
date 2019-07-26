@@ -20,13 +20,13 @@ namespace DocumentDB.Implementations.Command
         private readonly IMapper _mapper;
         private readonly Profile _mappingProfile;
 
-        public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile)
+        public CommandCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName,
+            Profile mappingProfile)
         {
             _cosmosDbEndpointUri = cosmosDbEndpointUri;
             _cosmosDbAccessKey = cosmosDbAccessKey;
             _databaseName = databaseName;
             _collectionName = collectionName;
-
             _mappingProfile = mappingProfile;
             _mapper = MappingConfiguration.Configure(_mappingProfile);
         }
@@ -42,10 +42,10 @@ namespace DocumentDB.Implementations.Command
 
                 var documentResponse = await container.CreateItemAsync(document, new PartitionKey(document.PartitionKey)).ConfigureAwait(false);
 
-                var documentList = new List<TDocument> { documentResponse.Resource };
+                var documentList = new List<TDocument> {documentResponse.Resource};
 
-                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList, _mapper);
-
+                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
+                    _mapper);
             }
         }
 
@@ -58,11 +58,13 @@ namespace DocumentDB.Implementations.Command
             {
                 var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                var documentResponse = await container.ReplaceItemAsync(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id, item: document).ConfigureAwait(false);
+                var documentResponse = await container
+                    .ReplaceItemAsync(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id, item: document).ConfigureAwait(false);
 
-                var documentList = new List<TDocument> { documentResponse.Resource };
+                var documentList = new List<TDocument> {documentResponse.Resource};
 
-                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList, _mapper);
+                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
+                    _mapper);
             }
         }
 
@@ -75,17 +77,20 @@ namespace DocumentDB.Implementations.Command
             {
                 var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                var documentResponse = await container.DeleteItemAsync<TDocument>(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id).ConfigureAwait(false);
+                var documentResponse = await container
+                    .DeleteItemAsync<TDocument>(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id).ConfigureAwait(false);
 
-                var documentList = new List<TDocument> { documentResponse.Resource };
+                var documentList = new List<TDocument> {documentResponse.Resource};
 
-                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList, _mapper);
+                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
+                    _mapper);
             }
         }
 
         private async Task<bool> DocumentExistsAsync(TDocument document)
         {
-            var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
+            var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName,
+                _collectionName, _mappingProfile);
 
             var cosmosDocumentResponse = await cosmosDbQueryRepository.GetByIdAsync(document.PartitionKey, document.Id).ConfigureAwait(false);
 

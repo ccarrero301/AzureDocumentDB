@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Implementations.Command;
-using DocumentDB.Implementations.Query;
 using IntegrationTests.Documents;
-using IntegrationTests.Specifications;
 
 namespace IntegrationTests.Tests
 {
@@ -20,9 +17,11 @@ namespace IntegrationTests.Tests
                 FamilyName = familyName
             };
 
-        internal static async Task<List<Person>> AddDocumentListToTestAsync(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile)
+        internal static async Task<List<Person>> AddDocumentListToTestAsync(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName,
+            string collectionName, Profile mappingProfile)
         {
-            var commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Person>(cosmosDbEndpointUri, cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
+            var commandCosmosDbRepository =
+                new CommandCosmosDbRepository<Person, Person>(cosmosDbEndpointUri, cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
 
             var peopleListToTest = new List<Person>
             {
@@ -40,10 +39,12 @@ namespace IntegrationTests.Tests
             return peopleListToTest;
         }
 
-        internal static async Task DeleteDocumentListToTestAsync(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile,
+        internal static async Task DeleteDocumentListToTestAsync(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName,
+            string collectionName, Profile mappingProfile,
             List<Person> peopleListToTest)
         {
-            var commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Person>(cosmosDbEndpointUri, cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
+            var commandCosmosDbRepository =
+                new CommandCosmosDbRepository<Person, Person>(cosmosDbEndpointUri, cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
 
             foreach (var personDocument in peopleListToTest)
             {
@@ -51,7 +52,8 @@ namespace IntegrationTests.Tests
             }
         }
 
-        internal static async Task DeleteDocumentByIdAndPartitionKeyToTestAsync(CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<Person> documentsToDelete)
+        internal static async Task DeleteDocumentByIdAndPartitionKeyToTestAsync(
+            CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<Person> documentsToDelete)
         {
             foreach (var personDocument in documentsToDelete)
             {
@@ -62,7 +64,8 @@ namespace IntegrationTests.Tests
         }
 
         internal static async Task<Person> InsertDocumentAsync(string id, string firstName, string middleName, string familyName,
-            CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<Person> documentsToDelete, bool deleteInTearDown = true)
+            CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<Person> documentsToDelete,
+            bool deleteInTearDown = true)
         {
             var personDocumentToAdd = CreateDocument(id, firstName, middleName, familyName);
 

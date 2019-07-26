@@ -20,18 +20,18 @@ namespace DocumentDB.Implementations.Query
         private readonly string _databaseName;
         private readonly IMapper _mapper;
 
-        public QueryCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile)
+        public QueryCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName,
+            Profile mappingProfile)
         {
             _cosmosDbEndpointUri = cosmosDbEndpointUri;
             _cosmosDbAccessKey = cosmosDbAccessKey;
             _databaseName = databaseName;
             _collectionName = collectionName;
-
             _mapper = MappingConfiguration.Configure(mappingProfile);
         }
 
-        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey, ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1,
-            int pageSize = 100)
+        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey,
+            ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100)
         {
             var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>();
 
@@ -41,8 +41,8 @@ namespace DocumentDB.Implementations.Query
 
                 var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey, pageSize);
 
-                var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions).Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize);
+                var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions)
+                    .Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
                 var documentIterator = documentQueryable.ToFeedIterator();
 
@@ -50,8 +50,8 @@ namespace DocumentDB.Implementations.Query
                 {
                     var documentFeedResponse = await documentIterator.ReadNextAsync().ConfigureAwait(false);
 
-                    cosmosDocumentResponse =
-                        new CosmosDocumentResponse<TDocument, TEntity>(documentFeedResponse.StatusCode, documentFeedResponse.RequestCharge, documentFeedResponse.Resource.ToList(), _mapper);
+                    cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentFeedResponse.StatusCode,
+                        documentFeedResponse.RequestCharge, documentFeedResponse.Resource.ToList(), _mapper);
                 }
             }
 
@@ -66,11 +66,13 @@ namespace DocumentDB.Implementations.Query
                 {
                     var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                    var documentResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId).ConfigureAwait(false);
+                    var documentResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId)
+                        .ConfigureAwait(false);
 
                     var documentList = new List<TDocument> {documentResponse.Resource};
 
-                    var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList, _mapper);
+                    var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode,
+                        documentResponse.RequestCharge, documentList, _mapper);
 
                     return cosmosDocumentResponse;
                 }

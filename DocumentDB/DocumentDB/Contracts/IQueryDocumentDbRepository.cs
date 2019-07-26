@@ -8,6 +8,7 @@ namespace DocumentDB.Contracts
     {
         Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string partitionKey, string documentId);
 
-        Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey, ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100);
+        Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey,
+            ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100);
     }
 }
