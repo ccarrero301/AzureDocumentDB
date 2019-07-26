@@ -4,6 +4,7 @@ using AutoMapper;
 using DocumentDB.Contracts;
 using DocumentDB.Exceptions;
 using DocumentDB.Mappings;
+using Microsoft.Azure.Cosmos;
 
 namespace DocumentDB.Implementations
 {
@@ -32,15 +33,15 @@ namespace DocumentDB.Implementations
             if (await DocumentExistsAsync(partitionKey, document.Id).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document already exists", document);
 
-            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
-                var documentCollectionUri = CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
+                var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                var documentCreated = await documentClient.CreateDocumentAsync(documentCollectionUri, document).ConfigureAwait(false);
+                var documentResponse = await container.CreateItemAsync(document, new PartitionKey(partitionKey)).ConfigureAwait(false);
 
-                document.Id = documentCreated.Resource.Id;
+                var documentCreated = documentResponse.Resource;
 
-                return _mapper.Map<TDocument, TEntity>(document);
+                return _mapper.Map<TDocument, TEntity>(documentCreated);
             }
         }
 
@@ -49,32 +50,32 @@ namespace DocumentDB.Implementations
             if (!await DocumentExistsAsync(partitionKey, document.Id).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document does not exist", document);
 
-            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
-                var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, document.Id);
+                var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                var requestOptions = CosmosDbUtilities.SetRequestOptions(partitionKey);
+                var documentResponse = await container.ReplaceItemAsync(partitionKey: new PartitionKey(partitionKey), id: document.Id, item: document).ConfigureAwait(false);
 
-                var documentUpdated = await documentClient.ReplaceDocumentAsync(documentUri, document, requestOptions).ConfigureAwait(false);
+                var documentUpdated = documentResponse.Resource;
 
-                document.Id = documentUpdated.Resource.Id;
-
-                return _mapper.Map<TDocument, TEntity>(document);
+                return _mapper.Map<TDocument, TEntity>(documentUpdated);
             }
         }
 
-        public async Task DeleteDocumentAsync(string documentId, string partitionKey)
+        public async Task<TEntity> DeleteDocumentAsync(string documentId, string partitionKey)
         {
             if (!await DocumentExistsAsync(partitionKey, documentId).ConfigureAwait(false))
                 throw new DocumentException<TDocument>($"Document with id {documentId} does not exist");
 
-            using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
-                var documentUri = CosmosDbUtilities.CreateDocumentUri(_databaseName, _collectionName, documentId);
+                var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                var requestOptions = CosmosDbUtilities.SetRequestOptions(partitionKey);
+                var documentResponse = await container.DeleteItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId).ConfigureAwait(false);
 
-                await documentClient.DeleteDocumentAsync(documentUri, requestOptions).ConfigureAwait(false);
+                var documentDeleted = documentResponse.Resource;
+
+                return _mapper.Map<TDocument, TEntity>(documentDeleted);
             }
         }
 

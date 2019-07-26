@@ -108,12 +108,13 @@ namespace IntegrationTests.Tests
         {
             var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("6", "Beatriz3", "Elena", "Johnson", _commandCosmosDbRepository, _documentsToDelete, false).ConfigureAwait(false);
 
-            await _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
+            var personEntityDeleted = await _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
-            var personEntityDeleted = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKeyAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile,
+            var personEntityFound = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKeyAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile,
                 personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
             Assert.IsTrue(personEntityDeleted == null);
+            Assert.IsTrue(personEntityFound == null);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace DocumentDB.Contracts
 
         Task<TEntity> UpdateDocumentAsync(TDocument document, string partitionKey);
 
-        Task DeleteDocumentAsync(string documentId, string partitionKey);
+        Task<TEntity> DeleteDocumentAsync(string documentId, string partitionKey);
     }
 }
