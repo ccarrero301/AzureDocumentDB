@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -6,10 +5,7 @@ using DocumentDB.Exceptions;
 using DocumentDB.Implementations;
 using IntegrationTests.Entities;
 using IntegrationTests.Mappings;
-using Microsoft.Azure.Cosmos;
 using NUnit.Framework;
-using System.Linq;
-using Microsoft.Azure.Cosmos.Linq;
 
 namespace IntegrationTests.Tests
 {
@@ -56,9 +52,8 @@ namespace IntegrationTests.Tests
         {
             var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("2", "Beatriz2", "Elena", "Saldarriaga", _commandCosmosDbRepository, _documentsToDelete).ConfigureAwait(false);
 
-            var personEntityFound = await IntegrationTestsUtils
-                .GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personDocumentAdded.Id, personDocumentAdded.FamilyName)
-                .ConfigureAwait(false);
+            var personEntityFound = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKeyAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile,
+                personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
             Assert.IsTrue(personEntityFound != null);
             Assert.IsTrue(personEntityFound.Id == personDocumentAdded.Id);
@@ -67,61 +62,58 @@ namespace IntegrationTests.Tests
             Assert.IsTrue(personEntityFound.MiddleName == "Elena");
         }
 
-        //[Test]
-        //public void TryToUpdateNotExistentDocument()
-        //{
-        //    var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument("3", "Carlos1", "Carrero", "Johnson");
+        [Test]
+        public void TryToUpdateNotExistentDocument()
+        {
+            var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument("3", "Carlos1", "Carrero", "Johnson");
 
-        //    var documentException =
-        //        Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentToUpdate.FamilyName));
+            var documentException =
+                Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentToUpdate.FamilyName));
 
-        //    Assert.IsTrue(documentException.Document != null);
-        //}
+            Assert.IsTrue(documentException.Document != null);
+        }
 
-        //[Test]
-        //public async Task UpdateDocument()
-        //{
-        //    var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("4", "Chris", "Jerry", "Johnson", _commandCosmosDbRepository, _documentsToDelete).ConfigureAwait(false);
+        [Test]
+        public async Task UpdateDocument()
+        {
+            var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("4", "Chris", "Jerry", "Johnson", _commandCosmosDbRepository, _documentsToDelete).ConfigureAwait(false);
 
-        //    var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument(personDocumentAdded.Id, "Carlos2", "Carrero", "Johnson");
+            var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument(personDocumentAdded.Id, "Carlos2", "Carrero", "Johnson");
 
-        //    var personEntityUpdated = await _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentAdded.FamilyName).ConfigureAwait(false);
+            var personEntityUpdated = await _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
-        //    var personEntityFound = await IntegrationTestsUtils
-        //        .GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personEntityUpdated.Id, personEntityUpdated.FamilyName)
-        //        .ConfigureAwait(false);
+            var personEntityFound = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKeyAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile,
+                personEntityUpdated.Id, personEntityUpdated.FamilyName).ConfigureAwait(false);
 
-        //    Assert.IsTrue(personEntityUpdated != null);
-        //    Assert.IsTrue(personEntityFound != null);
-        //    Assert.IsTrue(personEntityFound.FamilyName == "Johnson");
-        //    Assert.IsTrue(personEntityFound.FirstName == "Carlos2");
-        //    Assert.IsTrue(personEntityFound.MiddleName == "Carrero");
-        //}
+            Assert.IsTrue(personEntityUpdated != null);
+            Assert.IsTrue(personEntityFound != null);
+            Assert.IsTrue(personEntityFound.FamilyName == "Johnson");
+            Assert.IsTrue(personEntityFound.FirstName == "Carlos2");
+            Assert.IsTrue(personEntityFound.MiddleName == "Carrero");
+        }
 
-        //[Test]
-        //public void TryToDeleteNotExistentDocument()
-        //{
-        //    var personDocumentToDelete = IntegrationTestsUtils.CreateDocument("5", "Carlos3", "Carrero", "Johnson");
+        [Test]
+        public void TryToDeleteNotExistentDocument()
+        {
+            var personDocumentToDelete = IntegrationTestsUtils.CreateDocument("5", "Carlos3", "Carrero", "Johnson");
 
-        //    var documentException =
-        //        Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentToDelete.Id, personDocumentToDelete.FamilyName));
+            var documentException =
+                Assert.ThrowsAsync<DocumentException<Documents.Person>>(() => _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentToDelete.Id, personDocumentToDelete.FamilyName));
 
-        //    Assert.IsTrue(documentException.Document == null);
-        //}
+            Assert.IsTrue(documentException.Document == null);
+        }
 
-        //[Test]
-        //public async Task DeleteDocument()
-        //{
-        //    var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("6", "Beatriz3", "Elena", "Johnson", _commandCosmosDbRepository, _documentsToDelete, false).ConfigureAwait(false);
+        [Test]
+        public async Task DeleteDocument()
+        {
+            var personDocumentAdded = await IntegrationTestsUtils.InsertDocumentAsync("6", "Beatriz3", "Elena", "Johnson", _commandCosmosDbRepository, _documentsToDelete, false).ConfigureAwait(false);
 
-        //    await _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
+            await _commandCosmosDbRepository.DeleteDocumentAsync(personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
-        //    var personEntityDeleted = await IntegrationTestsUtils
-        //        .GetDocumentByIdAndPartitionKey(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, personDocumentAdded.Id, personDocumentAdded.FamilyName)
-        //        .ConfigureAwait(false);
+            var personEntityDeleted = await IntegrationTestsUtils.GetDocumentByIdAndPartitionKeyAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile,
+                personDocumentAdded.Id, personDocumentAdded.FamilyName).ConfigureAwait(false);
 
-        //    Assert.IsTrue(personEntityDeleted == null);
-        //}
-
+            Assert.IsTrue(personEntityDeleted == null);
+        }
     }
 }

@@ -6,8 +6,6 @@ using DocumentDB.Implementations;
 using IntegrationTests.Documents;
 using IntegrationTests.Mappings;
 using IntegrationTests.Specifications;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Linq;
 using NUnit.Framework;
 
 namespace IntegrationTests.Tests
@@ -22,158 +20,141 @@ namespace IntegrationTests.Tests
         private List<Person> _peopleListToTest;
         private QueryCosmosDbRepository<Entities.Person, Person> _queryCosmosDbRepository;
 
-        //[OneTimeSetUp]
-        //public async Task SetupAsync()
-        //{
-        //    _cosmosDbEndpointUri = "https://localhost:8081";
-        //    _cosmosDbAccessKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-        //    _databaseName = "People";
-        //    _collectionName = "PeopleCollection";
+        [OneTimeSetUp]
+        public async Task SetupAsync()
+        {
+            _cosmosDbEndpointUri = "https://localhost:8081";
+            _cosmosDbAccessKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+            _databaseName = "People";
+            _collectionName = "PeopleCollection";
 
-        //    _mappingProfile = new MappingProfile();
+            _mappingProfile = new MappingProfile();
 
-        //    _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
-        //    _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile).ConfigureAwait(false);
-        //}
+            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile).ConfigureAwait(false);
+        }
 
-        //[OneTimeTearDown]
-        //public Task TearDownAsync() =>
-        //    IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, _peopleListToTest);
-
-        //[Test]
-        //public async Task GetNotExistentDocumentByIdAndPartitionKey()
-        //{
-        //    const string documentId = "-1";
-        //    const string partitionKey = "Carrero";
-
-        //    var personByIdAndPartitionKey = await _queryCosmosDbRepository.GetDocumentByIdAsync(documentId, partitionKey).ConfigureAwait(false);
-
-        //    Assert.IsTrue(personByIdAndPartitionKey == null);
-        //}
-
-        //[Test]
-        //public async Task GetDocumentByIdAndPartitionKey()
-        //{
-        //    const string documentId = "1";
-        //    const string partitionKey = "Carrero";
-
-        //    var personByIdAndPartitionKey = await _queryCosmosDbRepository.GetDocumentByIdAsync(documentId, partitionKey).ConfigureAwait(false);
-
-        //    Assert.IsTrue(personByIdAndPartitionKey != null);
-        //    Assert.IsTrue(personByIdAndPartitionKey.FamilyName == "Carrero");
-        //    Assert.IsTrue(personByIdAndPartitionKey.FirstName == "Carlos");
-        //    Assert.IsTrue(personByIdAndPartitionKey.MiddleName == "Andres");
-        //}
-
-        //[Test]
-        //public void GetDocumentsBySpecification()
-        //{
-        //    var carlosFirstNameSpecification = new FirstNameSpecification("Carlos");
-        //    const string partitionKey = "Carrero";
-
-        //    var documentsBySpecificationList = _queryCosmosDbRepository.GetBySpecification(carlosFirstNameSpecification, partitionKey).ToList();
-
-        //    Assert.IsTrue(documentsBySpecificationList.Count == 1);
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FirstName == "Carlos");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.MiddleName == "Andres");
-        //}
-
-        //[Test]
-        //public async Task GetPaginatedResultsByExpressionSpecification()
-        //{
-        //    var familyNameSpecification = new FamilyNameSpecification("Carrero");
-        //    const string partitionKey = "Carrero";
-
-        //    var (continuationToken, documentsBySpecificationList) = await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey).ConfigureAwait(false);
-
-        //    Assert.IsTrue(continuationToken == null);
-        //    Assert.IsTrue(documentsBySpecificationList.Count() == 3);
-        //}
-
-        //[Test]
-        //public async Task GetPageOneResultsByExpressionSpecification()
-        //{
-        //    var familyNameSpecification = new FamilyNameSpecification("Carrero");
-        //    const string partitionKey = "Carrero";
-
-        //    var (continuationToken, documentsBySpecificationList) =
-        //        await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
-
-        //    Assert.IsTrue(continuationToken != null);
-        //    Assert.IsTrue(documentsBySpecificationList.Count() == 1);
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FirstName == "Carlos");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.MiddleName == "Andres");
-        //}
-
-        //[Test]
-        //public async Task GetPageTwoResultsByExpressionSpecification()
-        //{
-        //    var familyNameSpecification = new FamilyNameSpecification("Carrero");
-        //    const string partitionKey = "Carrero";
-
-        //    var (continuationToken, documentsBySpecificationList) =
-        //        await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
-
-        //    (continuationToken, documentsBySpecificationList) =
-        //        await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
-
-        //    Assert.IsTrue(continuationToken != null);
-        //    Assert.IsTrue(documentsBySpecificationList.Count() == 1);
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Luis");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Miguel");
-        //}
-
-        //[Test]
-        //public async Task GetPageThreeResultsByExpressionSpecification()
-        //{
-        //    var familyNameSpecification = new FamilyNameSpecification("Carrero");
-        //    const string partitionKey = "Carrero";
-
-        //    var (continuationToken, documentsBySpecificationList) =
-        //        await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 1, 1).ConfigureAwait(false);
-
-        //    (continuationToken, documentsBySpecificationList) =
-        //        await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 2, 1, continuationToken).ConfigureAwait(false);
-
-        //    (continuationToken, documentsBySpecificationList) =
-        //        await _queryCosmosDbRepository.GetPaginatedResultsBySpecificationAsync(familyNameSpecification, partitionKey, 3, 1, continuationToken).ConfigureAwait(false);
-
-        //    Assert.IsTrue(continuationToken == null);
-        //    Assert.IsTrue(documentsBySpecificationList.Count() == 1);
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FamilyName == "Carrero");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().FirstName == "Miguel");
-        //    Assert.IsTrue(documentsBySpecificationList.FirstOrDefault().MiddleName == "Antonio");
-        //}
+        [OneTimeTearDown]
+        public Task TearDownAsync() =>
+            IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile, _peopleListToTest);
 
         [Test]
-        public async Task GetDocumentByIdAsync()
+        public async Task GetNotExistentDocumentByIdAndPartitionKey()
         {
-            using (var cosmosClient = new CosmosClient("https://localhost:8081", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="))
-            {
-                var container = cosmosClient.GetContainer("People", "PeopleCollection");
-                var queryRequestOptions = new QueryRequestOptions()
-                {
-                    PartitionKey = new PartitionKey("Saldarriaga")
-                };
+            const string documentId = "-1";
+            const string partitionKey = "Carrero";
 
-                var q = container.GetItemLinqQueryable<Person>();
-                var iterator = q.Where(p => p.Id == "2").ToFeedIterator<Person>();
+            var personByIdAndPartitionKey = await _queryCosmosDbRepository.GetByIdAsync(partitionKey, documentId).ConfigureAwait(false);
 
-                //var results = await iterator.ReadNextAsync();
+            Assert.IsTrue(personByIdAndPartitionKey == null);
+        }
 
-                while (iterator.HasMoreResults)
-                {
-                    foreach (var entity in await iterator.ReadNextAsync())
-                    {
-                        var i = entity;
-                    }
-                }
-            }
+        [Test]
+        public async Task GetDocumentByIdAndPartitionKey()
+        {
+            const string documentId = "1";
+            const string partitionKey = "Carrero";
 
+            var personByIdAndPartitionKey = await _queryCosmosDbRepository.GetByIdAsync(partitionKey, documentId).ConfigureAwait(false);
+
+            Assert.IsTrue(personByIdAndPartitionKey != null);
+            Assert.IsTrue(personByIdAndPartitionKey.FamilyName == "Carrero");
+            Assert.IsTrue(personByIdAndPartitionKey.FirstName == "Carlos");
+            Assert.IsTrue(personByIdAndPartitionKey.MiddleName == "Andres");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecification()
+        {
+            var carlosFirstNameSpecification = new FirstNameSpecification("Carlos");
+            const string partitionKey = "Carrero";
+
+            var documentsBySpecificationList = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, carlosFirstNameSpecification).ConfigureAwait(false)).ToList();
+
+            Assert.IsTrue(documentsBySpecificationList.Count() == 1);
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FirstName == "Carlos");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.MiddleName == "Andres");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecificationPageOnePageSizeOne()
+        {
+            var familyNameSpecification = new FamilyNameSpecification("Carrero");
+            const string partitionKey = "Carrero";
+
+            var documentsBySpecificationList = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 1).ConfigureAwait(false)).ToList();
+
+            Assert.IsTrue(documentsBySpecificationList.Count == 1);
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.FirstName == "Carlos");
+            Assert.IsTrue(documentsBySpecificationList.FirstOrDefault()?.MiddleName == "Andres");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecificationPageOnePageSizeTwo()
+        {
+            var familyNameSpecification = new FamilyNameSpecification("Carrero");
+            const string partitionKey = "Carrero";
+
+            var documentsBySpecificationList = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 2).ConfigureAwait(false)).ToList();
+
+            Assert.IsTrue(documentsBySpecificationList.Count == 2);
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FirstName == "Carlos");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.MiddleName == "Andres");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(1)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(1)?.FirstName == "Luis");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(1)?.MiddleName == "Miguel");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecificationPageOnePageSizeThree()
+        {
+            var familyNameSpecification = new FamilyNameSpecification("Carrero");
+            const string partitionKey = "Carrero";
+
+            var documentsBySpecificationList = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 3).ConfigureAwait(false)).ToList();
+
+            Assert.IsTrue(documentsBySpecificationList.Count == 3);
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FirstName == "Carlos");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.MiddleName == "Andres");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(1)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(1)?.FirstName == "Luis");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(1)?.MiddleName == "Miguel");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(2)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(2)?.FirstName == "Miguel");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(2)?.MiddleName == "Antonio");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecificationPageTwoPageSizeOne()
+        {
+            var familyNameSpecification = new FamilyNameSpecification("Carrero");
+            const string partitionKey = "Carrero";
+
+            var documentsBySpecificationList = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 2, 1).ConfigureAwait(false)).ToList();
+
+            Assert.IsTrue(documentsBySpecificationList.Count == 1);
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FirstName == "Luis");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.MiddleName == "Miguel");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecificationPageThreePageSizeOne()
+        {
+            var familyNameSpecification = new FamilyNameSpecification("Carrero");
+            const string partitionKey = "Carrero";
+
+            var documentsBySpecificationList = (await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 3, 1).ConfigureAwait(false)).ToList();
+
+            Assert.IsTrue(documentsBySpecificationList.Count == 1);
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FamilyName == "Carrero");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.FirstName == "Miguel");
+            Assert.IsTrue(documentsBySpecificationList.ElementAt(0)?.MiddleName == "Antonio");
         }
     }
 }

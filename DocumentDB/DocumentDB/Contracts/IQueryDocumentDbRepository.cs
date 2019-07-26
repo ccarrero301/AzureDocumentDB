@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Specification.Base;
-using Specification.Contracts;
 
 namespace DocumentDB.Contracts
 {
-    internal interface IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity where TEntity : IEntity
+    internal interface IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
     {
-        Task<TEntity> GetDocumentByIdAsync(string documentId, string partitionKey);
+        Task<TEntity> GetByIdAsync(string partitionKey, string documentId);
 
-        //IEnumerable<TEntity> GetBySpecification(ISpecification<TDocument> documentSpecification, string partitionKey);
-
-        //Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey,
-        //    int pageNumber = 1, int pageSize = 100, string continuationToken = null);
+        Task<IEnumerable<TEntity>> GetBySpecificationAsync(string partitionKey, ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100);
     }
 }

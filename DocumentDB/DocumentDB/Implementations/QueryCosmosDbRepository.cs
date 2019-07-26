@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Contracts;
 using DocumentDB.Mappings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Linq;
 using Specification.Base;
-using Specification.Contracts;
 
 namespace DocumentDB.Implementations
 {
-    public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity where TEntity : IEntity
+    public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
     {
         private readonly string _collectionName;
         private readonly string _cosmosDbAccessKey;
@@ -32,68 +29,59 @@ namespace DocumentDB.Implementations
             _mapper = MappingConfiguration.Configure(mappingProfile);
         }
 
-        public async Task<TEntity> GetDocumentByIdAsync(string documentId, string partitionKey)
+        public async Task<IEnumerable<TEntity>> GetBySpecificationAsync(string partitionKey, ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100)
         {
+            var entityList = new List<TEntity>();
+
             using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
                 var container = cosmosClient.GetContainer(_databaseName, _collectionName);
-                var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey);
 
-                var documentQueryable = container.GetItemLinqQueryable<TDocument>();
-                var iterator = documentQueryable.Where(entity => entity.Id == documentId).ToFeedIterator<TDocument>();
-                
-                while (iterator.HasMoreResults)
+                var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey, pageSize);
+
+                var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions).AsQueryable();
+
+                var filteredDocumentQueryable = documentQueryable.Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+                var documentIterator = filteredDocumentQueryable.ToFeedIterator();
+
+                while (documentIterator.HasMoreResults)
                 {
-                    foreach (var document in await iterator.ReadNextAsync())
+                    foreach (var document in await documentIterator.ReadNextAsync().ConfigureAwait(false))
                     {
-                        //return document;
-                        return _mapper.Map<TDocument, TEntity>(document);
+                        var entity = _mapper.Map<TDocument, TEntity>(document);
+                        entityList.Add(entity);
                     }
                 }
             }
 
-            return default;
+            return entityList;
         }
 
-        //public IEnumerable<TEntity> GetBySpecification(ISpecification<TDocument> documentSpecification, string partitionKey)
-        //{
-        //    using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
-        //    {
-        //        var documentCollectionUri = CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
+        public async Task<TEntity> GetByIdAsync(string partitionKey, string documentId)
+        {
+            TEntity entity;
 
-        //        var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey);
+            try
+            {
+                using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+                {
+                    var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-        //        var documentList = documentClient.CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions).Where(documentSpecification.IsSatisfiedBy);
+                    var entityResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId).ConfigureAwait(false);
 
-        //        return _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList);
-        //    }
-        //}
+                    entity = _mapper.Map<TDocument, TEntity>(entityResponse.Resource);
+                }
+            }
+            catch (CosmosException cosmosException)
+            {
+                if (cosmosException.StatusCode == HttpStatusCode.NotFound)
+                    return default;
 
-        //public async Task<(string continuationToken, IEnumerable<TEntity>)> GetPaginatedResultsBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification, string partitionKey,
-        //    int pageNumber = 1, int pageSize = 100, string continuationToken = null)
-        //{
-        //    var documentList = new List<TDocument>();
+                return default;
+            }
 
-        //    using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
-        //    {
-        //        var documentCollectionUri = CosmosDbUtilities.CreateDocumentCollectionUri(_databaseName, _collectionName);
-
-        //        var feedOptions = CosmosDbUtilities.SetFeedOptions(partitionKey, pageSize, false, continuationToken);
-
-        //        using (var documentQuery = documentClient.CreateDocumentQuery<TDocument>(documentCollectionUri, feedOptions).Where(documentSpecification.ToExpression()).AsDocumentQuery())
-        //        {
-        //            var feedResponse = await documentQuery.ExecuteNextAsync<TDocument>().ConfigureAwait(false);
-
-        //            foreach (var document in feedResponse)
-        //            {
-        //                documentList.Add(document);
-        //            }
-
-        //            var updatedContinuationToken = feedResponse.ResponseContinuation;
-
-        //            return (updatedContinuationToken, _mapper.Map<IEnumerable<TDocument>, IEnumerable<TEntity>>(documentList));
-        //        }
-        //    }
-        //}
+            return entity;
+        }
     }
 }

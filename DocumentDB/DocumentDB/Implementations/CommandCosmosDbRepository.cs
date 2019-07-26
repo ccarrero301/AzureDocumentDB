@@ -29,7 +29,7 @@ namespace DocumentDB.Implementations
 
         public async Task<TEntity> AddDocumentAsync(TDocument document, string partitionKey)
         {
-            if (await DocumentExistsAsync(document.Id, partitionKey).ConfigureAwait(false))
+            if (await DocumentExistsAsync(partitionKey, document.Id).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document already exists", document);
 
             using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
@@ -46,7 +46,7 @@ namespace DocumentDB.Implementations
 
         public async Task<TEntity> UpdateDocumentAsync(TDocument document, string partitionKey)
         {
-            if (!await DocumentExistsAsync(document.Id, partitionKey).ConfigureAwait(false))
+            if (!await DocumentExistsAsync(partitionKey, document.Id).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document does not exist", document);
 
             using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
@@ -65,7 +65,7 @@ namespace DocumentDB.Implementations
 
         public async Task DeleteDocumentAsync(string documentId, string partitionKey)
         {
-            if (!await DocumentExistsAsync(documentId, partitionKey).ConfigureAwait(false))
+            if (!await DocumentExistsAsync(partitionKey, documentId).ConfigureAwait(false))
                 throw new DocumentException<TDocument>($"Document with id {documentId} does not exist");
 
             using (var documentClient = CosmosDbUtilities.CreateDocumentClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
@@ -78,11 +78,11 @@ namespace DocumentDB.Implementations
             }
         }
 
-        private async Task<bool> DocumentExistsAsync(string documentId, string partitionKey)
+        private async Task<bool> DocumentExistsAsync(string partitionKey, string documentId)
         {
             var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile);
 
-            var entity = await cosmosDbQueryRepository.GetDocumentByIdAsync(documentId, partitionKey).ConfigureAwait(false);
+            var entity = await cosmosDbQueryRepository.GetByIdAsync(partitionKey, documentId).ConfigureAwait(false);
 
             return !EqualityComparer<TEntity>.Default.Equals(entity, default);
         }

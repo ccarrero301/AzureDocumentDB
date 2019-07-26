@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace IntegrationTests.Documents
 {
-    internal class Person : IEntity
+    public class Person : IEntity
     {
         [JsonProperty(PropertyName = "firstName")] public string FirstName { get; set; }
 

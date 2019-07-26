@@ -20,19 +20,11 @@ namespace DocumentDB.Implementations
                 PartitionKey = new PartitionKey(partitionKey)
             };
 
-        internal static FeedOptions SetFeedOptions(string partitionKey, int maxItemCount = 100, bool enableCrossPartitionQuery = false, string continuationToken = null) =>
-            new FeedOptions
-            {
-                PartitionKey = new PartitionKey(partitionKey),
-                MaxItemCount = maxItemCount,
-                EnableCrossPartitionQuery = enableCrossPartitionQuery,
-                RequestContinuation = continuationToken
-            };
-
-        internal static QueryRequestOptions SetQueryRequestOptions(string partitionKey) =>
+        internal static QueryRequestOptions SetQueryRequestOptions(string partitionKey, int maxItemCount = 100) =>
             new QueryRequestOptions
             {
-                PartitionKey = new Microsoft.Azure.Cosmos.PartitionKey(partitionKey)
+                PartitionKey = new Microsoft.Azure.Cosmos.PartitionKey(partitionKey),
+                MaxItemCount = maxItemCount
             };
     }
 }

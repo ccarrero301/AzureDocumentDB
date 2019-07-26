@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Implementations;
 using IntegrationTests.Documents;
+using IntegrationTests.Specifications;
 
 namespace IntegrationTests.Tests
 {
@@ -71,12 +73,16 @@ namespace IntegrationTests.Tests
             return personDocumentToAdd;
         }
 
-        internal static Task<Entities.Person> GetDocumentByIdAndPartitionKey(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName, Profile mappingProfile,
-            string id, string partitionKey)
+        internal static async Task<Entities.Person> GetDocumentByIdAndPartitionKeyAsync(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName,
+            Profile mappingProfile, string id, string partitionKey)
         {
             var queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(cosmosDbEndpointUri, cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
 
-            return queryCosmosDbRepository.GetDocumentByIdAsync(id, partitionKey);
+            var documentByIdSpecification = new DocumentByIdSpecification(id);
+
+            var peopleList = await queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, documentByIdSpecification).ConfigureAwait(false);
+
+            return peopleList.FirstOrDefault();
         }
     }
 }

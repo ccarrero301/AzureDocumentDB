@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentDB", "DocumentDB\DocumentDB.csproj", "{3F9BD65B-C83B-4F16-AB4E-929A9F941C5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{71864E0C-AF37-429F-A38E-9DF304E2F264}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{71864E0C-AF37-429F-A38E-9DF304E2F264}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
