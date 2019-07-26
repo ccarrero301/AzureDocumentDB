@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Implementations.Query;
+using DocumentDB.Implementations.Utils;
 using IntegrationTests.Documents;
 using IntegrationTests.Mappings;
 using IntegrationTests.Specifications;
@@ -13,32 +14,22 @@ namespace IntegrationTests.Tests
 {
     public class QueryPeopleCollectionTests
     {
-        private string _collectionName;
-        private string _cosmosDbAccessKey;
-        private string _cosmosDbEndpointUri;
-        private string _databaseName;
-        private Profile _mappingProfile;
+        private CosmosDbConfiguration _cosmosDbConfiguration;
         private List<Person> _peopleListToTest;
         private QueryCosmosDbRepository<Entities.Person, Person> _queryCosmosDbRepository;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            _cosmosDbEndpointUri = "https://localhost:8081";
-            _cosmosDbAccessKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-            _databaseName = "People";
-            _collectionName = "PeopleCollection";
-            _mappingProfile = new MappingProfile();
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName,
-                _collectionName, _mappingProfile);
-            _peopleListToTest = await IntegrationTestsUtils
-                .AddDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName, _collectionName, _mappingProfile)
-                .ConfigureAwait(false);
+            _cosmosDbConfiguration = new CosmosDbConfiguration("https://localhost:8081",
+                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection",
+                new MappingProfile());
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbConfiguration);
+            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbConfiguration).ConfigureAwait(false);
         }
 
         [OneTimeTearDown]
-        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbEndpointUri, _cosmosDbAccessKey, _databaseName,
-            _collectionName, _mappingProfile, _peopleListToTest);
+        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbConfiguration, _peopleListToTest);
 
         [Test]
         public async Task GetNotExistentDocumentByIdAndPartitionKey()

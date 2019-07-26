@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using DocumentDB.Exceptions;
 using DocumentDB.Implementations.Command;
+using DocumentDB.Implementations.Utils;
 using IntegrationTests.Entities;
 using IntegrationTests.Mappings;
 using NUnit.Framework;
@@ -13,25 +13,18 @@ namespace IntegrationTests.Tests
 {
     public class CommandPeopleCollectionTests
     {
-        private string _collectionName;
         private CommandCosmosDbRepository<Person, Documents.Person> _commandCosmosDbRepository;
-        private string _cosmosDbAccessKey;
-        private string _cosmosDbEndpointUri;
-        private string _databaseName;
+        private CosmosDbConfiguration _cosmosDbConfiguration;
         private List<Documents.Person> _documentsToDelete;
-        private Profile _mappingProfile;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            _cosmosDbEndpointUri = "https://localhost:8081";
-            _cosmosDbAccessKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-            _databaseName = "People";
-            _collectionName = "PeopleCollection";
+            _cosmosDbConfiguration = new CosmosDbConfiguration("https://localhost:8081",
+                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection",
+                new MappingProfile());
             _documentsToDelete = new List<Documents.Person>();
-            _mappingProfile = new MappingProfile();
-            _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbEndpointUri, _cosmosDbAccessKey,
-                _databaseName, _collectionName, _mappingProfile);
+            _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbConfiguration);
         }
 
         [OneTimeTearDown]

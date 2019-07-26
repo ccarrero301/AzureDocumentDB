@@ -14,20 +14,13 @@ namespace DocumentDB.Implementations.Query
 {
     public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
     {
-        private readonly string _collectionName;
-        private readonly string _cosmosDbAccessKey;
-        private readonly string _cosmosDbEndpointUri;
-        private readonly string _databaseName;
+        private CosmosDbConfiguration CosmosDbConfiguration { get; }
         private readonly IMapper _mapper;
 
-        public QueryCosmosDbRepository(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName,
-            Profile mappingProfile)
+        public QueryCosmosDbRepository(CosmosDbConfiguration cosmosDbConfiguration)
         {
-            _cosmosDbEndpointUri = cosmosDbEndpointUri;
-            _cosmosDbAccessKey = cosmosDbAccessKey;
-            _databaseName = databaseName;
-            _collectionName = collectionName;
-            _mapper = MappingConfiguration.Configure(mappingProfile);
+            CosmosDbConfiguration = cosmosDbConfiguration;
+            _mapper = MappingConfiguration.Configure(cosmosDbConfiguration.MappingProfile);
         }
 
         public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey,
@@ -35,9 +28,9 @@ namespace DocumentDB.Implementations.Query
         {
             var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>();
 
-            using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+            using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
             {
-                var container = cosmosClient.GetContainer(_databaseName, _collectionName);
+                var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
 
                 var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey, pageSize);
 
@@ -62,9 +55,9 @@ namespace DocumentDB.Implementations.Query
         {
             try
             {
-                using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
+                using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
                 {
-                    var container = cosmosClient.GetContainer(_databaseName, _collectionName);
+                    var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
 
                     var documentResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId)
                         .ConfigureAwait(false);
