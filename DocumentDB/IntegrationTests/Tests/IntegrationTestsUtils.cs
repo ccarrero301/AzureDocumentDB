@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using DocumentDB.Implementations;
+using DocumentDB.Implementations.Command;
+using DocumentDB.Implementations.Query;
 using IntegrationTests.Documents;
 using IntegrationTests.Specifications;
 
@@ -71,18 +72,6 @@ namespace IntegrationTests.Tests
                 documentsToDelete.Add(personDocumentToAdd);
 
             return personDocumentToAdd;
-        }
-
-        internal static async Task<Entities.Person> GetDocumentByIdAndPartitionKeyAsync(string cosmosDbEndpointUri, string cosmosDbAccessKey, string databaseName, string collectionName,
-            Profile mappingProfile, string id, string partitionKey)
-        {
-            var queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(cosmosDbEndpointUri, cosmosDbAccessKey, databaseName, collectionName, mappingProfile);
-
-            var documentByIdSpecification = new DocumentByIdSpecification(id);
-
-            var peopleList = await queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, documentByIdSpecification).ConfigureAwait(false);
-
-            return peopleList.FirstOrDefault();
         }
     }
 }

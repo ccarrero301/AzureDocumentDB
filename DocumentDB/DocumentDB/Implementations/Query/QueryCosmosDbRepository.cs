@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Contracts;
+using DocumentDB.Implementations.Utils;
 using DocumentDB.Mappings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Specification.Base;
 
-namespace DocumentDB.Implementations
+namespace DocumentDB.Implementations.Query
 {
     public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
     {
@@ -28,9 +30,10 @@ namespace DocumentDB.Implementations
             _mapper = MappingConfiguration.Configure(mappingProfile);
         }
 
-        public async Task<IEnumerable<TEntity>> GetBySpecificationAsync(string partitionKey, ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100)
+        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey, ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1,
+            int pageSize = 100)
         {
-            var entityList = new List<TEntity>();
+            var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>();
 
             using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
             {
@@ -45,38 +48,37 @@ namespace DocumentDB.Implementations
 
                 while (documentIterator.HasMoreResults)
                 {
-                    foreach (var document in await documentIterator.ReadNextAsync().ConfigureAwait(false))
-                    {
-                        var entity = _mapper.Map<TDocument, TEntity>(document);
-                        entityList.Add(entity);
-                    }
+                    var documentFeedResponse = await documentIterator.ReadNextAsync().ConfigureAwait(false);
+
+                    cosmosDocumentResponse =
+                        new CosmosDocumentResponse<TDocument, TEntity>(documentFeedResponse.StatusCode, documentFeedResponse.RequestCharge, documentFeedResponse.Resource.ToList(), _mapper);
                 }
             }
 
-            return entityList;
+            return cosmosDocumentResponse;
         }
 
-        public async Task<TEntity> GetByIdAsync(string partitionKey, string documentId)
+        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string partitionKey, string documentId)
         {
-            TEntity entity;
-
             try
             {
                 using (var cosmosClient = new CosmosClient(_cosmosDbEndpointUri, _cosmosDbAccessKey))
                 {
                     var container = cosmosClient.GetContainer(_databaseName, _collectionName);
 
-                    var entityResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId).ConfigureAwait(false);
+                    var documentResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId).ConfigureAwait(false);
 
-                    entity = _mapper.Map<TDocument, TEntity>(entityResponse.Resource);
+                    var documentList = new List<TDocument> {documentResponse.Resource};
+
+                    var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList, _mapper);
+
+                    return cosmosDocumentResponse;
                 }
             }
             catch (CosmosException)
             {
-                return default;
+                return new CosmosDocumentResponse<TDocument, TEntity>(HttpStatusCode.NotFound, 0, null, _mapper);
             }
-
-            return entity;
         }
     }
 }

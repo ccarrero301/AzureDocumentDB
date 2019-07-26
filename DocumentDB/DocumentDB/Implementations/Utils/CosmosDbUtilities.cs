@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 
-namespace DocumentDB.Implementations
+namespace DocumentDB.Implementations.Utils
 {
     internal static class CosmosDbUtilities
     {
