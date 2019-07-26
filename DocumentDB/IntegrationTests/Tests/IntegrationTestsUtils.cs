@@ -33,7 +33,7 @@ namespace IntegrationTests.Tests
 
             foreach (var personDocument in peopleListToTest)
             {
-                await commandCosmosDbRepository.AddDocumentAsync(personDocument, personDocument.FamilyName).ConfigureAwait(false);
+                await commandCosmosDbRepository.AddDocumentAsync(personDocument).ConfigureAwait(false);
             }
 
             return peopleListToTest;
@@ -46,29 +46,29 @@ namespace IntegrationTests.Tests
 
             foreach (var personDocument in peopleListToTest)
             {
-                await commandCosmosDbRepository.DeleteDocumentAsync(personDocument.Id, personDocument.FamilyName).ConfigureAwait(false);
+                await commandCosmosDbRepository.DeleteDocumentAsync(personDocument).ConfigureAwait(false);
             }
         }
 
-        internal static async Task DeleteDocumentByIdAndPartitionKeyToTestAsync(CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<(string, string)> documentsToDelete)
+        internal static async Task DeleteDocumentByIdAndPartitionKeyToTestAsync(CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<Person> documentsToDelete)
         {
-            foreach (var (documentId, partitionKey) in documentsToDelete)
+            foreach (var personDocument in documentsToDelete)
             {
-                await commandCosmosDbRepository.DeleteDocumentAsync(documentId, partitionKey).ConfigureAwait(false);
+                await commandCosmosDbRepository.DeleteDocumentAsync(personDocument).ConfigureAwait(false);
             }
 
             documentsToDelete.Clear();
         }
 
         internal static async Task<Person> InsertDocumentAsync(string id, string firstName, string middleName, string familyName,
-            CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<(string, string)> documentsToDelete, bool deleteInTearDown = true)
+            CommandCosmosDbRepository<Entities.Person, Person> commandCosmosDbRepository, List<Person> documentsToDelete, bool deleteInTearDown = true)
         {
             var personDocumentToAdd = CreateDocument(id, firstName, middleName, familyName);
 
-            await commandCosmosDbRepository.AddDocumentAsync(personDocumentToAdd, personDocumentToAdd.FamilyName).ConfigureAwait(false);
+            await commandCosmosDbRepository.AddDocumentAsync(personDocumentToAdd).ConfigureAwait(false);
 
             if (deleteInTearDown)
-                documentsToDelete.Add((id, familyName));
+                documentsToDelete.Add(personDocumentToAdd);
 
             return personDocumentToAdd;
         }

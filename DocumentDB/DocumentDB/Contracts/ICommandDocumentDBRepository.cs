@@ -4,10 +4,10 @@ namespace DocumentDB.Contracts
 {
     internal interface ICommandDocumentDbRepository<TEntity, in TDocument> where TDocument : IEntity
     {
-        Task<TEntity> AddDocumentAsync(TDocument document, string partitionKey);
+        Task<TEntity> AddDocumentAsync(TDocument document);
 
-        Task<TEntity> UpdateDocumentAsync(TDocument document, string partitionKey);
+        Task<TEntity> UpdateDocumentAsync(TDocument document);
 
-        Task<TEntity> DeleteDocumentAsync(string documentId, string partitionKey);
+        Task<TEntity> DeleteDocumentAsync(TDocument document);
     }
 }

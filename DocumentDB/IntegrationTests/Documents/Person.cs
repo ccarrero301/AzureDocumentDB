@@ -12,5 +12,7 @@ namespace IntegrationTests.Documents
         [JsonProperty(PropertyName = "familyName")] public string FamilyName { get; set; }
 
         [JsonProperty(PropertyName = "id")] public string Id { get; set; }
+
+        public string PartitionKey => FamilyName;
     }
 }
