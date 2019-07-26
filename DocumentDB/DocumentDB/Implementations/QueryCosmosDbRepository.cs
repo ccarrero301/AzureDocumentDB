@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using DocumentDB.Contracts;
@@ -39,11 +38,10 @@ namespace DocumentDB.Implementations
 
                 var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey, pageSize);
 
-                var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions).AsQueryable();
+                var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions).Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize);
 
-                var filteredDocumentQueryable = documentQueryable.Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
-                var documentIterator = filteredDocumentQueryable.ToFeedIterator();
+                var documentIterator = documentQueryable.ToFeedIterator();
 
                 while (documentIterator.HasMoreResults)
                 {
@@ -73,11 +71,8 @@ namespace DocumentDB.Implementations
                     entity = _mapper.Map<TDocument, TEntity>(entityResponse.Resource);
                 }
             }
-            catch (CosmosException cosmosException)
+            catch (CosmosException)
             {
-                if (cosmosException.StatusCode == HttpStatusCode.NotFound)
-                    return default;
-
                 return default;
             }
 
