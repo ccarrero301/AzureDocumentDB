@@ -68,7 +68,7 @@ namespace IntegrationTests.Tests
             var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, carlosFirstNameSpecification)
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
             Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 1);
             Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.FamilyName == "Carrero");
@@ -85,7 +85,7 @@ namespace IntegrationTests.Tests
             var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 1)
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
             Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 1);
             Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.FamilyName == "Carrero");
@@ -102,7 +102,7 @@ namespace IntegrationTests.Tests
             var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 2)
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
             Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 2);
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.FamilyName == "Carrero");
@@ -122,7 +122,7 @@ namespace IntegrationTests.Tests
             var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 1, 3)
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
             Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 3);
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.FamilyName == "Carrero");
@@ -145,7 +145,7 @@ namespace IntegrationTests.Tests
             var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 2, 1)
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
             Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 1);
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.FamilyName == "Carrero");
@@ -162,7 +162,7 @@ namespace IntegrationTests.Tests
             var cosmosDocumentResponse = await _queryCosmosDbRepository.GetBySpecificationAsync(partitionKey, familyNameSpecification, 3, 1)
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == 0);
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
             Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
             Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 1);
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.FamilyName == "Carrero");
