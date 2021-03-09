@@ -3,12 +3,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using DesignPatterns.DomainDrivenDesign.Specification.Base;
 using DocumentDB.Contracts;
 using DocumentDB.Implementations.Utils;
 using DocumentDB.Mappings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
-using Specification.Base;
 
 namespace DocumentDB.Implementations.Query
 {

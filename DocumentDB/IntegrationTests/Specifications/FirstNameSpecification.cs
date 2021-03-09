@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
+using DesignPatterns.DomainDrivenDesign.Specification.Base;
 using IntegrationTests.Documents;
-using Specification.Base;
 
 namespace IntegrationTests.Specifications
 {

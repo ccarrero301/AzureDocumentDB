@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using DesignPatterns.DomainDrivenDesign.Specification.Base;
 using DocumentDB.Implementations.Utils;
-using Specification.Base;
 
 namespace DocumentDB.Contracts
 {
