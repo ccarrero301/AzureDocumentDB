@@ -28,24 +28,23 @@ namespace DocumentDB.Implementations.Query
         {
             var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>();
 
-            using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
+            using var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey);
+            
+            var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
+
+            var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey, pageSize);
+
+            var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions)
+                .Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+            var documentIterator = documentQueryable.ToFeedIterator();
+
+            while (documentIterator.HasMoreResults)
             {
-                var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
+                var documentFeedResponse = await documentIterator.ReadNextAsync().ConfigureAwait(false);
 
-                var queryRequestOptions = CosmosDbUtilities.SetQueryRequestOptions(partitionKey, pageSize);
-
-                var documentQueryable = container.GetItemLinqQueryable<TDocument>(requestOptions: queryRequestOptions)
-                    .Where(documentSpecification.ToExpression()).Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
-                var documentIterator = documentQueryable.ToFeedIterator();
-
-                while (documentIterator.HasMoreResults)
-                {
-                    var documentFeedResponse = await documentIterator.ReadNextAsync().ConfigureAwait(false);
-
-                    cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentFeedResponse.StatusCode,
-                        documentFeedResponse.RequestCharge, documentFeedResponse.Resource.ToList(), _mapper);
-                }
+                cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentFeedResponse.StatusCode,
+                    documentFeedResponse.RequestCharge, documentFeedResponse.Resource.ToList(), _mapper);
             }
 
             return cosmosDocumentResponse;
@@ -55,20 +54,19 @@ namespace DocumentDB.Implementations.Query
         {
             try
             {
-                using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
-                {
-                    var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
+                using var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey);
+                
+                var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
 
-                    var documentResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId)
-                        .ConfigureAwait(false);
+                var documentResponse = await container.ReadItemAsync<TDocument>(partitionKey: new PartitionKey(partitionKey), id: documentId)
+                    .ConfigureAwait(false);
 
-                    var documentList = new List<TDocument> {documentResponse.Resource};
+                var documentList = new List<TDocument> {documentResponse.Resource};
 
-                    var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode,
-                        documentResponse.RequestCharge, documentList, _mapper);
+                var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode,
+                    documentResponse.RequestCharge, documentList, _mapper);
 
-                    return cosmosDocumentResponse;
-                }
+                return cosmosDocumentResponse;
             }
             catch (CosmosException)
             {
