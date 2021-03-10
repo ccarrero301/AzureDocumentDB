@@ -4,7 +4,7 @@ using DocumentDB.Implementations.Utils;
 
 namespace DocumentDB.Contracts
 {
-    internal interface IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
+    internal interface IQueryDocumentDbRepository<TEntity, TDocument>
     {
         Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string partitionKey, string documentId);
 

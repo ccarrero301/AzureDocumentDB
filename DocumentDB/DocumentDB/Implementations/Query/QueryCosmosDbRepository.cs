@@ -12,7 +12,7 @@ using Microsoft.Azure.Cosmos.Linq;
 
 namespace DocumentDB.Implementations.Query
 {
-    public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument> where TDocument : IEntity
+    public class QueryCosmosDbRepository<TEntity, TDocument> : IQueryDocumentDbRepository<TEntity, TDocument>
     {
         private CosmosDbConfiguration CosmosDbConfiguration { get; }
         private readonly IMapper _mapper;

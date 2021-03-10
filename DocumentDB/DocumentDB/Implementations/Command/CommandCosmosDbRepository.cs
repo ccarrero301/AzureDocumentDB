@@ -27,17 +27,16 @@ namespace DocumentDB.Implementations.Command
             if (await DocumentExistsAsync(document).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document already exists", document);
 
-            using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
-            {
-                var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
+            using var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey);
+            
+            var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
 
-                var documentResponse = await container.CreateItemAsync(document, new PartitionKey(document.PartitionKey)).ConfigureAwait(false);
+            var documentResponse = await container.CreateItemAsync(document, new PartitionKey(document.PartitionKey)).ConfigureAwait(false);
 
-                var documentList = new List<TDocument> {documentResponse.Resource};
+            var documentList = new List<TDocument> {documentResponse.Resource};
 
-                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
-                    _mapper);
-            }
+            return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
+                _mapper);
         }
 
         public async Task<CosmosDocumentResponse<TDocument, TEntity>> UpdateDocumentAsync(TDocument document)
@@ -45,18 +44,17 @@ namespace DocumentDB.Implementations.Command
             if (!await DocumentExistsAsync(document).ConfigureAwait(false))
                 throw new DocumentException<TDocument>("Document does not exist", document);
 
-            using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
-            {
-                var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
+            using var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey);
+            
+            var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
 
-                var documentResponse = await container
-                    .ReplaceItemAsync(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id, item: document).ConfigureAwait(false);
+            var documentResponse = await container
+                .ReplaceItemAsync(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id, item: document).ConfigureAwait(false);
 
-                var documentList = new List<TDocument> {documentResponse.Resource};
+            var documentList = new List<TDocument> {documentResponse.Resource};
 
-                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
-                    _mapper);
-            }
+            return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
+                _mapper);
         }
 
         public async Task<CosmosDocumentResponse<TDocument, TEntity>> DeleteDocumentAsync(TDocument document)
@@ -64,19 +62,17 @@ namespace DocumentDB.Implementations.Command
             if (!await DocumentExistsAsync(document).ConfigureAwait(false))
                 throw new DocumentException<TDocument>($"Document with id {document.Id} does not exist");
 
-            using (var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey))
-            {
-                var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
+            using var cosmosClient = new CosmosClient(CosmosDbConfiguration.Endpoint, CosmosDbConfiguration.AccessKey);
+            
+            var container = cosmosClient.GetContainer(CosmosDbConfiguration.DatabaseName, CosmosDbConfiguration.CollectionName);
 
+            var documentResponse = await container
+                .DeleteItemAsync<TDocument>(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id).ConfigureAwait(false);
 
-                var documentResponse = await container
-                    .DeleteItemAsync<TDocument>(partitionKey: new PartitionKey(document.PartitionKey), id: document.Id).ConfigureAwait(false);
+            var documentList = new List<TDocument> {documentResponse.Resource};
 
-                var documentList = new List<TDocument> {documentResponse.Resource};
-
-                return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
-                    _mapper);
-            }
+            return new CosmosDocumentResponse<TDocument, TEntity>(documentResponse.StatusCode, documentResponse.RequestCharge, documentList,
+                _mapper);
         }
 
         private async Task<bool> DocumentExistsAsync(TDocument document)
