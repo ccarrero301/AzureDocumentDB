@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Carlos Carrero</Authors>
     <Company>Carlos Carrero</Company>
     <Description>Document DB client</Description>
@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://github.com/ccarrero301/AzureDocumentDB</PackageProjectUrl>
     <PackageTags>Document DB</PackageTags>
     <PackageId>CQRSDocumentDB</PackageId>
+    <PackageReleaseNotes>Removes entity restriction for querys</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
