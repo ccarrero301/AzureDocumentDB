@@ -9,6 +9,7 @@
     <Copyright>Free</Copyright>
     <PackageProjectUrl>https://github.com/ccarrero301/AzureDocumentDB</PackageProjectUrl>
     <PackageTags>Document DB</PackageTags>
+    <PackageId>CQRSDocumentDB</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
