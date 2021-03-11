@@ -77,7 +77,7 @@ namespace IntegrationTests.Tests
             var personDocumentAdded = await IntegrationTestsUtils
                 .InsertDocumentAsync("4", "Chris", "Jerry", "Johnson", _commandCosmosDbRepository, _documentsToDelete).ConfigureAwait(false);
 
-            var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument(personDocumentAdded.Id, "Carlos2", "Carrero", "Johnson");
+            var personDocumentToUpdate = IntegrationTestsUtils.CreateDocument(personDocumentAdded.DocumentId, "Carlos2", "Carrero", "Johnson");
 
             var cosmosDocumentResponse = await _commandCosmosDbRepository.UpdateDocumentAsync(personDocumentToUpdate).ConfigureAwait(false);
 

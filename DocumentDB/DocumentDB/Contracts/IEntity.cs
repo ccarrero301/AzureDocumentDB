@@ -2,7 +2,7 @@
 {
     public interface IEntity
     {
-        string Id { get; set; }
+        string DocumentId { get; set; }
 
         string PartitionKey { get; }
     }

@@ -16,6 +16,7 @@ namespace IntegrationTests.Tests
         private CosmosDbConfiguration _cosmosDbConfiguration;
         private List<Person> _peopleListToTest;
         private QueryCosmosDbRepository<Entities.Person, Person> _queryCosmosDbRepository;
+        private QueryCosmosDbRepository<Entities.Person, Entities.Person> _querySameEntityAndDocumentCosmosDbRepository;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -24,6 +25,7 @@ namespace IntegrationTests.Tests
                 "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection",
                 new MappingProfile());
             _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbConfiguration);
+            _querySameEntityAndDocumentCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Entities.Person>(_cosmosDbConfiguration);
             _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbConfiguration).ConfigureAwait(false);
         }
 
@@ -168,6 +170,39 @@ namespace IntegrationTests.Tests
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.FamilyName == "Carrero");
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.FirstName == "Miguel");
             Assert.IsTrue(cosmosDocumentResponse.Entities.ElementAt(0)?.MiddleName == "Antonio");
+        }
+
+        [Test]
+        public async Task GetDocumentByIdWhenDocumentAndEntityAreOfTheSameType()
+        {
+            const string documentId = "1";
+            const string partitionKey = "Carrero";
+
+            var cosmosDocumentResponse = await _querySameEntityAndDocumentCosmosDbRepository.GetByIdAsync(partitionKey, documentId).ConfigureAwait(false);
+
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
+            Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault() != null);
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.FamilyName == "Carrero");
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.FirstName == "Carlos");
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.MiddleName == "Andres");
+        }
+
+        [Test]
+        public async Task GetDocumentsBySpecificationWhenDocumentAndEntityAreOfTheSameTypePageOnePageSizeOne()
+        {
+            var entityFamilyNameSpecification = new EntityFamilyNameSpecification("Carrero");
+            const string partitionKey = "Carrero";
+
+            var cosmosDocumentResponse = await _querySameEntityAndDocumentCosmosDbRepository.GetBySpecificationAsync(partitionKey, entityFamilyNameSpecification, 1)
+                .ConfigureAwait(false);
+
+            Assert.IsTrue(cosmosDocumentResponse.HttpStatusCode == HttpStatusCode.OK);
+            //Assert.IsTrue(cosmosDocumentResponse.RequestCharge > 0);
+            //Assert.IsTrue(cosmosDocumentResponse.Entities.Count() == 1);
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.FamilyName == "Carrero");
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.FirstName == "Carlos");
+            Assert.IsTrue(cosmosDocumentResponse.Entities.FirstOrDefault()?.MiddleName == "Andres");
         }
     }
 }

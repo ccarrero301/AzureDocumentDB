@@ -9,9 +9,9 @@ namespace IntegrationTests.Tests
     internal static class IntegrationTestsUtils
     {
         internal static Person CreateDocument(string id, string firstName, string middleName, string familyName) =>
-            new Person
+            new()
             {
-                Id = id,
+                DocumentId = id,
                 FirstName = firstName,
                 MiddleName = middleName,
                 FamilyName = familyName
