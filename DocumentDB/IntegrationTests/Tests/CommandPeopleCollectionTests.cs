@@ -21,10 +21,13 @@ namespace IntegrationTests.Tests
         public void Setup()
         {
             _cosmosDbConfiguration = new CosmosDbConfiguration("https://localhost:8081",
-                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection",
-                new MappingProfile());
+                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection");
+            
             _documentsToDelete = new List<Documents.Person>();
-            _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbConfiguration);
+            
+            var mapper = MappingConfiguration.Configure(new MappingProfile());
+
+            _commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Documents.Person>(_cosmosDbConfiguration, mapper);
         }
 
         [OneTimeTearDown]

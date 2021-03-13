@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Authors>Carlos Carrero</Authors>
     <Company>Carlos Carrero</Company>
     <Description>Document DB client</Description>
@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://github.com/ccarrero301/AzureDocumentDB</PackageProjectUrl>
     <PackageTags>Document DB</PackageTags>
     <PackageId>CQRSDocumentDB</PackageId>
-    <PackageReleaseNotes>Support .NET Standard 2.1 and .NET 5.0</PackageReleaseNotes>
+    <PackageReleaseNotes>Pass IMapper instead of mapping profile in repository constructors</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

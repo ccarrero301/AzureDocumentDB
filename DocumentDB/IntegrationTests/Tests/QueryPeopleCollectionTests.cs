@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using DocumentDB.Implementations.Query;
 using DocumentDB.Implementations.Utils;
 using IntegrationTests.Documents;
@@ -17,20 +18,25 @@ namespace IntegrationTests.Tests
         private List<Person> _peopleListToTest;
         private QueryCosmosDbRepository<Entities.Person, Person> _queryCosmosDbRepository;
         private QueryCosmosDbRepository<Entities.Person, Entities.Person> _querySameEntityAndDocumentCosmosDbRepository;
+        private IMapper _mapper;
 
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
             _cosmosDbConfiguration = new CosmosDbConfiguration("https://localhost:8081",
-                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection",
-                new MappingProfile());
-            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbConfiguration);
-            _querySameEntityAndDocumentCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Entities.Person>(_cosmosDbConfiguration);
-            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbConfiguration).ConfigureAwait(false);
+                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", "People", "PeopleCollection");
+
+            _mapper = MappingConfiguration.Configure(new MappingProfile());
+
+            _queryCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Person>(_cosmosDbConfiguration, _mapper);
+            
+            _querySameEntityAndDocumentCosmosDbRepository = new QueryCosmosDbRepository<Entities.Person, Entities.Person>(_cosmosDbConfiguration, _mapper);
+            
+            _peopleListToTest = await IntegrationTestsUtils.AddDocumentListToTestAsync(_cosmosDbConfiguration, _mapper).ConfigureAwait(false);
         }
 
         [OneTimeTearDown]
-        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbConfiguration, _peopleListToTest);
+        public Task TearDownAsync() => IntegrationTestsUtils.DeleteDocumentListToTestAsync(_cosmosDbConfiguration, _peopleListToTest, _mapper);
 
         [Test]
         public async Task GetNotExistentDocumentByIdAndPartitionKey()

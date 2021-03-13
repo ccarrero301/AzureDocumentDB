@@ -6,7 +6,6 @@ using DocumentDB.Contracts;
 using DocumentDB.Exceptions;
 using DocumentDB.Implementations.Query;
 using DocumentDB.Implementations.Utils;
-using DocumentDB.Mappings;
 using Microsoft.Azure.Cosmos;
 
 namespace DocumentDB.Implementations.Command
@@ -16,10 +15,10 @@ namespace DocumentDB.Implementations.Command
         private CosmosDbConfiguration CosmosDbConfiguration { get; }
         private readonly IMapper _mapper;
 
-        public CommandCosmosDbRepository(CosmosDbConfiguration cosmosDbConfiguration)
+        public CommandCosmosDbRepository(CosmosDbConfiguration cosmosDbConfiguration, IMapper mapper)
         {
             CosmosDbConfiguration = cosmosDbConfiguration;
-            _mapper = MappingConfiguration.Configure(cosmosDbConfiguration.MappingProfile);
+            _mapper = mapper;
         }
 
         public async Task<CosmosDocumentResponse<TDocument, TEntity>> AddDocumentAsync(TDocument document)
@@ -77,7 +76,7 @@ namespace DocumentDB.Implementations.Command
 
         private async Task<bool> DocumentExistsAsync(TDocument document)
         {
-            var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(CosmosDbConfiguration);
+            var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(CosmosDbConfiguration, _mapper);
 
             var cosmosDocumentResponse = await cosmosDbQueryRepository.GetByIdAsync(document.PartitionKey, document.DocumentId).ConfigureAwait(false);
 

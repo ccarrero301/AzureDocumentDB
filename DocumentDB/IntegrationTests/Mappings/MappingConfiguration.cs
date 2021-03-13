@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace DocumentDB.Mappings
+namespace IntegrationTests.Mappings
 {
     internal class MappingConfiguration
     {

@@ -6,7 +6,6 @@ using AutoMapper;
 using DesignPatterns.DomainDrivenDesign.Specification.Base;
 using DocumentDB.Contracts;
 using DocumentDB.Implementations.Utils;
-using DocumentDB.Mappings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 
@@ -17,10 +16,10 @@ namespace DocumentDB.Implementations.Query
         private CosmosDbConfiguration CosmosDbConfiguration { get; }
         private readonly IMapper _mapper;
 
-        public QueryCosmosDbRepository(CosmosDbConfiguration cosmosDbConfiguration)
+        public QueryCosmosDbRepository(CosmosDbConfiguration cosmosDbConfiguration, IMapper mapper)
         {
             CosmosDbConfiguration = cosmosDbConfiguration;
-            _mapper = MappingConfiguration.Configure(cosmosDbConfiguration.MappingProfile);
+            _mapper = mapper;
         }
 
         public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey,

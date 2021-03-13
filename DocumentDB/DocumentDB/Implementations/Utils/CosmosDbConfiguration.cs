@@ -1,16 +1,13 @@
-﻿using AutoMapper;
-
-namespace DocumentDB.Implementations.Utils
+﻿namespace DocumentDB.Implementations.Utils
 {
     public class CosmosDbConfiguration
     {
-        public CosmosDbConfiguration(string endpoint, string accessKey, string databaseName, string collectionName, Profile mappingProfile)
+        public CosmosDbConfiguration(string endpoint, string accessKey, string databaseName, string collectionName)
         {
             Endpoint = endpoint;
             AccessKey = accessKey;
             DatabaseName = databaseName;
             CollectionName = collectionName;
-            MappingProfile = mappingProfile;
         }
 
         public string Endpoint { get; }
@@ -20,7 +17,5 @@ namespace DocumentDB.Implementations.Utils
         public string DatabaseName { get; }
 
         public string CollectionName { get; }
-
-        public Profile MappingProfile { get; }
     }
 }

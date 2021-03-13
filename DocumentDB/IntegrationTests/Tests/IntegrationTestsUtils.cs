@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using DocumentDB.Implementations.Command;
 using DocumentDB.Implementations.Utils;
 using IntegrationTests.Documents;
@@ -17,9 +18,9 @@ namespace IntegrationTests.Tests
                 FamilyName = familyName
             };
 
-        internal static async Task<List<Person>> AddDocumentListToTestAsync(CosmosDbConfiguration cosmosDbConfiguration)
+        internal static async Task<List<Person>> AddDocumentListToTestAsync(CosmosDbConfiguration cosmosDbConfiguration, IMapper mapper)
         {
-            var commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Person>(cosmosDbConfiguration);
+            var commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Person>(cosmosDbConfiguration, mapper);
 
             var peopleListToTest = new List<Person>
             {
@@ -37,9 +38,9 @@ namespace IntegrationTests.Tests
             return peopleListToTest;
         }
 
-        internal static async Task DeleteDocumentListToTestAsync(CosmosDbConfiguration cosmosDbConfiguration, List<Person> peopleListToTest)
+        internal static async Task DeleteDocumentListToTestAsync(CosmosDbConfiguration cosmosDbConfiguration, List<Person> peopleListToTest, IMapper mapper)
         {
-            var commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Person>(cosmosDbConfiguration);
+            var commandCosmosDbRepository = new CommandCosmosDbRepository<Person, Person>(cosmosDbConfiguration, mapper);
 
             foreach (var personDocument in peopleListToTest)
             {
