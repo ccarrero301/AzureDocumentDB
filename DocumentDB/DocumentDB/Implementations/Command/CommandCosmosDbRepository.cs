@@ -78,7 +78,7 @@ namespace DocumentDB.Implementations.Command
         {
             var cosmosDbQueryRepository = new QueryCosmosDbRepository<TEntity, TDocument>(CosmosDbConfiguration, _mapper);
 
-            var cosmosDocumentResponse = await cosmosDbQueryRepository.GetByIdAsync(document.PartitionKey, document.DocumentId).ConfigureAwait(false);
+            var cosmosDocumentResponse = await cosmosDbQueryRepository.GetByIdAsync(document.DocumentId, document.PartitionKey).ConfigureAwait(false);
 
             var entity = cosmosDocumentResponse.Entities.FirstOrDefault();
 

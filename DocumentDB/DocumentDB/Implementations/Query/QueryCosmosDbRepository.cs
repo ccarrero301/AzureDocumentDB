@@ -22,8 +22,8 @@ namespace DocumentDB.Implementations.Query
             _mapper = mapper;
         }
 
-        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey,
-            ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100)
+        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification,
+            string partitionKey = "", int pageNumber = 1, int pageSize = 100)
         {
             var cosmosDocumentResponse = new CosmosDocumentResponse<TDocument, TEntity>();
 
@@ -49,7 +49,7 @@ namespace DocumentDB.Implementations.Query
             return cosmosDocumentResponse;
         }
 
-        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string partitionKey, string documentId)
+        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string documentId, string partitionKey = "")
         {
             try
             {

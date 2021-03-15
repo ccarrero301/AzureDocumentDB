@@ -6,9 +6,9 @@ namespace DocumentDB.Contracts
 {
     internal interface IQueryDocumentDbRepository<TEntity, TDocument>
     {
-        Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string partitionKey, string documentId);
+        Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string documentId, string partitionKey = "");
 
-        Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(string partitionKey,
-            ExpressionSpecification<TDocument> documentSpecification, int pageNumber = 1, int pageSize = 100);
+        Task<CosmosDocumentResponse<TDocument, TEntity>> GetBySpecificationAsync(ExpressionSpecification<TDocument> documentSpecification,
+            string partitionKey = "", int pageNumber = 1, int pageSize = 100);
     }
 }
