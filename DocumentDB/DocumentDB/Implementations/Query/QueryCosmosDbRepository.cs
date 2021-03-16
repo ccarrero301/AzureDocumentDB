@@ -49,7 +49,7 @@ namespace DocumentDB.Implementations.Query
             return cosmosDocumentResponse;
         }
 
-        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string documentId, string partitionKey = "")
+        public async Task<CosmosDocumentResponse<TDocument, TEntity>> GetByIdAsync(string documentId, string partitionKey)
         {
             try
             {

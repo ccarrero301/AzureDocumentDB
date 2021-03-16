@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <Authors>Carlos Carrero</Authors>
     <Company>Carlos Carrero</Company>
     <Description>Document DB client</Description>
@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://github.com/ccarrero301/AzureDocumentDB</PackageProjectUrl>
     <PackageTags>Document DB</PackageTags>
     <PackageId>CQRSDocumentDB</PackageId>
-    <PackageReleaseNotes>Fixes issue setting partition key value to null to allow cross partition queries</PackageReleaseNotes>
+    <PackageReleaseNotes>Partition key value should not be optional for single document queries</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
